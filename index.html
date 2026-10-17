@@ -2,7 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#262d3d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hoedobe">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <title>Hoedobe</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
@@ -100,6 +108,7 @@ header input[type=range]:disabled{opacity:.4}
 header output{min-width:34px;color:var(--text);font-size:12px}
 #cp{position:fixed;z-index:30;width:268px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;box-shadow:0 8px 28px #000a}
 #cp[hidden]{display:none}
+#cp{max-height:calc(100vh - 100px);overflow:auto}
 .cprev{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 #cpsw{width:38px;height:30px;border-radius:6px;border:1px solid #0007;flex:none}
 #chex{flex:1;min-width:0;background:#1d2332;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font:13px ui-monospace,Consolas,monospace}
@@ -117,6 +126,31 @@ header output{min-width:34px;color:var(--text);font-size:12px}
 .cg button.cur{outline:2px solid var(--acc);outline-offset:1px}
 .cg.edit button:not(.empty){outline:2px dashed var(--acc);outline-offset:1px}
 @media(max-width:640px){main{grid-template-columns:1fr}aside{display:none}}
+#nag{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bar,0px) + env(safe-area-inset-bottom,0px) + 14px);z-index:40;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;background:var(--panel);border:1px solid var(--acc);border-radius:10px;padding:10px 14px;box-shadow:0 6px 24px #000b;width:max-content;max-width:94vw}
+#nag[hidden],#inst[hidden],#copy[hidden]{display:none}
+.feel{display:flex;align-items:center;gap:8px;color:var(--mute);font-size:12px;margin-top:10px}
+.feel input{flex:1;min-width:0}
+#sh,#ins{text-align:center}
+#ins ol{text-align:left;margin:10px 0;padding-left:22px}
+/* Phone and tablet: one scrolling toolbar along the bottom, bigger touch targets. */
+@media (pointer:coarse),(max-width:760px){
+  :root{--bar:68px}
+  body:not(.phone){grid-template-rows:1fr;padding-bottom:calc(var(--bar) + env(safe-area-inset-bottom,0px))}
+  body:not(.phone)>header{position:fixed;left:0;right:0;bottom:0;z-index:25;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);border-bottom:0;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+  header>*{flex:none;order:20}
+  header h1,header .sep{display:none}
+  header [data-tool]{order:1}
+  header #cbtn{order:2}header #undo{order:3}header #redo{order:4}header #save{order:5}header #copy{order:6}
+  header label[for=f]{order:7}header label[for=f2]{order:8}header #fbtn{order:9}header #rvb{order:10}
+  header #flat{order:11}header #inst{order:12}header #asb{order:13;margin-left:0!important}
+  .b,button{min-height:46px;min-width:46px;padding:8px 14px;font-size:15px;display:inline-flex;align-items:center;justify-content:center}
+  header label.f{min-height:46px}
+  input[type=number]{width:66px;height:46px;font-size:16px}
+  header input[type=range]{width:110px;height:30px}
+  #fb{top:max(10px,env(safe-area-inset-top,0px));right:10px;left:10px}
+  #fq{font-size:16px;min-width:0;flex:1}
+  .pg .t{font-size:inherit}
+}
 </style>
 </head>
 <body class="tool-select">
@@ -147,6 +181,8 @@ header output{min-width:34px;color:var(--text);font-size:12px}
   <button id="zi" title="Zoom in" aria-label="Zoom in">+</button>
   <button id="asb" title="Autosave settings" style="margin-left:auto">Autosave: on</button>
   <button id="flat" title="Bake everything into a plain PDF: fields and edits become fixed, no undo data. Doesn't affect autosaves.">Flatten &amp; export</button>
+  <button id="inst" hidden title="Install Hoedobe as an app so it opens on its own and works offline">Install app</button>
+  <button id="copy" hidden title="Send a copy to Files, Mail, AirDrop and so on">Save a copy</button>
   <button id="save" class="pri">Save PDF</button>
 </header>
 <main>
@@ -206,6 +242,7 @@ header output{min-width:34px;color:var(--text);font-size:12px}
     <button id="ssv" class="pri">Save and use</button>
     <button id="qbtn">Sign from phone</button>
   </div>
+  <label class="feel">Pen feel <span>Steady</span><input type="range" id="sf" min="0" max="100" value="50" aria-label="Pen feel: steady line to thick-and-thin"><span>Expressive</span></label>
   <div class="row" id="qr" hidden>
     <div id="qimg"></div>
     <div><p id="qst" style="margin:0"></p><code id="qurl"></code></div>
@@ -225,6 +262,9 @@ header output{min-width:34px;color:var(--text);font-size:12px}
   <p id="lst" class="mut" style="font-size:12px"></p>
   <p class="mut" style="font-size:12px">Signatures are saved in this browser. Link a file to keep an automatic copy on your computer, or use Back up to save a one-time copy.</p>
 </dialog>
+<div id="nag" hidden role="status"><span id="nagt">You have changes that aren't saved outside this browser.</span><button id="nags" class="pri"></button><button id="nagl">Later</button></div>
+<dialog id="sh"><h2>Your copy is ready</h2><p class="mut">Tap the button to choose where it goes.</p><div class="row" style="justify-content:center"><button id="shg" class="pri">Share / Save…</button><button id="shx">Cancel</button></div></dialog>
+<dialog id="ins"><h2>Install Hoedobe</h2><div id="insb"></div><div class="row" style="justify-content:center"><button id="insx" class="pri">Got it</button></div></dialog>
 <div id="ph">
   <p id="pt">Sign below. Turn your phone sideways for more room.</p>
   <canvas id="pc" width="1840" height="920"></canvas>
@@ -233,6 +273,7 @@ header output{min-width:34px;color:var(--text);font-size:12px}
     <button id="pclr">Clear</button>
     <button id="psend" class="pri">Send to computer</button>
   </div>
+  <label class="feel" style="width:min(100%,420px)">Pen feel <span>Steady</span><input type="range" id="pf" min="0" max="100" value="50" aria-label="Pen feel"><span>Expressive</span></label>
   <p id="pst" class="mut">Connecting…</p>
 </div>
 <script>
@@ -285,7 +326,7 @@ async function addFile(f,append){
     const pg=await pdf.getPage(n),v=pg.getViewport({scale:1});
     pages.push({d,n,rot:0,w:v.width,h:v.height,ann:[]});
   }
-  if(!append)baseline=cap();
+  if(!append){baseline=cap();if(touchy()){const mw=Math.max(...pages.map(q=>dims(q)[0]));scale=Math.max(.3,Math.min(1.3,(V.clientWidth-24)/mw))}}
   build();
 }
 
@@ -308,7 +349,7 @@ function build(){
   const vs=V.scrollTop,ts=T.scrollTop;
   sel=null;hits=[];cur=-1;V.innerHTML=T.innerHTML='';
   $('#empty').hidden=pages.length>0;
-  $('#z').textContent=Math.round(scale*100/1.3*1.3)+'%';
+  $('#z').textContent=Math.round(scale*100)+'%';
   pages.forEach((p,i)=>{
     const [W,H]=dims(p);
     const el=document.createElement('div');
@@ -478,10 +519,10 @@ function savePreset(i){presets[i]=curColor();lset('hoedobe.presets',presets);set
 function applyColor(c){setColor(c);cSnap=false;paintColorUI(c)}
 function openCP(){
   const cp=$('#cp'),b=$('#cbtn').getBoundingClientRect();
-  cp.hidden=false;cp.style.top=(b.bottom+6)+'px';
+  cp.hidden=false;renderSwatches();paintColorUI(curColor());
+  cp.style.top=(b.top>innerHeight/2?Math.max(8,b.top-cp.offsetHeight-8):b.bottom+6)+'px';
   cp.style.left=Math.max(8,Math.min(b.left,innerWidth-cp.offsetWidth-8))+'px';
   $('#cbtn').setAttribute('aria-expanded','true');
-  renderSwatches();paintColorUI(curColor());
 }
 function closeCP(){$('#cp').hidden=true;$('#cbtn').setAttribute('aria-expanded','false');cSnap=false;setEditing(false)}
 $('#cbtn').onclick=()=>$('#cp').hidden?openCP():closeCP();
@@ -807,13 +848,15 @@ function openSig(){listSigs();clearPad();fileUI();$('#sg').showModal()}
 function addSig(src,w,h){const id='s'+Date.now();sigs.push({id,src,w,h});srcs[id]=src;persist();return id}
 
 // Pressure/speed-sensitive ink so strokes look hand-drawn. Used on desktop and on the phone.
-function attachPad(c,color){
+function attachPad(c,color,feel=()=>50){
   const g=c.getContext('2d'),k=c.width/920;
   let down=false,ink=false,lx=0,ly=0,mx=0,my=0,lw=3*k,lt=0;
   const pt=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]};
   const seg=e=>{
     const [px,py]=pt(e),dt=Math.max(1,e.timeStamp-lt),sp=Math.hypot(px-lx,py-ly)/dt/k;
-    const target=((e.pointerType=='pen'&&e.pressure>0)?1.5+8*e.pressure:Math.max(2.2,7-sp*3))*k;
+    // Pen feel: 0 = one steady width, 50 = the original look, 100 = strongly thick-and-thin.
+    const raw=(e.pointerType=='pen'&&e.pressure>0)?1.5+8*e.pressure:Math.max(2.2,7-sp*3);
+    const target=Math.max(1.2,4.5+(raw-4.5)*feel()/50)*k;
     const w=lw*.7+target*.3,nx=(lx+px)/2,ny=(ly+py)/2;
     g.lineWidth=w;g.beginPath();g.moveTo(mx,my);g.quadraticCurveTo(lx,ly,nx,ny);g.stroke();
     mx=nx;my=ny;lx=px;ly=py;lt=e.timeStamp;lw=w;
@@ -840,7 +883,9 @@ function attachPad(c,color){
     }
   };
 }
-const pad=attachPad($('#sc'),()=>$('#sk').value);
+const penFeel=()=>{try{const v=localStorage.getItem('hoedobe.penfeel');return v==null?50:+v}catch(e){return 50}};
+for(const id of ['sf','pf']){const el=$('#'+id);if(el){el.value=penFeel();el.oninput=()=>{try{localStorage.setItem('hoedobe.penfeel',el.value)}catch(e){}}}}
+const pad=attachPad($('#sc'),()=>$('#sk').value,penFeel);
 function clearPad(){pad.clear()}
 $('#sclr').onclick=clearPad;
 $('#scl').onclick=()=>$('#sg').close();
@@ -880,7 +925,7 @@ $('#sg').addEventListener('close',stopPhone);
 
 // Phone side: opened from the QR code as  page.html#phone=<id>
 function phoneMode(id){
-  const pp=attachPad($('#pc'),()=>$('#pk').value),st=$('#pst');
+  const pp=attachPad($('#pc'),()=>$('#pk').value,penFeel),st=$('#pst');
   document.body.classList.add('phone');
   if(typeof Peer=='undefined'){st.textContent='Could not load the connection library. Check your internet connection and reload.';return}
   const me=new Peer();let conn=null;
@@ -1074,7 +1119,7 @@ $('#rvb').onclick=()=>{if(pages.length)$('#rv').showModal()};
 $('#rvx').onclick=()=>$('#rv').close();
 $('#rvy').onclick=()=>{$('#rv').close();revert()};
 $('#zi').onclick=()=>{scale=Math.min(3,scale+.2);build()};
-$('#zo').onclick=()=>{scale=Math.max(.5,scale-.2);build()};
+$('#zo').onclick=()=>{scale=Math.max(.3,scale-.2);build()};
 
 // ---- Autosave: a draft inside the browser, plus rolling files in a folder ----
 // Saves 3 seconds after you stop editing, or every minute if you never pause. Bigger files wait longer.
@@ -1096,6 +1141,7 @@ function newSession(name){
 }
 function touch(){
   if(!pages.length)return;
+  if(!A.unsaved)nagT=Date.now();
   A.dirty=true;A.unsaved=true;
   clearTimeout(A.tDraft);A.tDraft=setTimeout(draftSave,1000);
   if(!A.tDraftMax)A.tDraftMax=setTimeout(draftSave,10000);
@@ -1375,17 +1421,70 @@ async function exportFlat(){
   try{
     const bytes=await buildPdf({flat:true}),blob=new Blob([bytes],{type:'application/pdf'});
     if(h){const w=await h.createWritable();await w.write(blob);await w.close();return}
-    const file=new File([blob],name,{type:'application/pdf'});
-    if(navigator.canShare&&navigator.canShare({files:[file]})){
-      try{await navigator.share({files:[file],title:name});return}catch(e){if(e.name==='AbortError')return}
-    }
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    await shareFile(blob,name);
   }catch(err){alert('Could not export: '+err.message)}
   finally{btn.disabled=false;btn.textContent=old}
 }
 $('#flat').onclick=exportFlat;
 $('#save').onclick=save;
+
+// ---- Phone: share sheet, reminders, install, offline ----
+var nagT=Date.now();
+const touchy=()=>matchMedia('(pointer:coarse)').matches||innerWidth<=760;
+function shareLater(file){
+  // Some phones only allow the share sheet right after a tap; if the slow part used that up, ask for one more tap.
+  return new Promise(res=>{
+    const d=$('#sh');d.showModal();
+    $('#shg').onclick=async()=>{try{await navigator.share({files:[file],title:file.name});d.close();res('shared')}catch(e){if(e.name==='AbortError'){d.close();res('cancel')}else{d.close();dl(file);res('download')}}};
+    $('#shx').onclick=()=>{d.close();res('cancel')};
+  });
+}
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name||blob.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}
+async function shareFile(blob,name){
+  const file=new File([blob],name,{type:'application/pdf'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:name});return 'shared'}
+    catch(e){if(e.name==='AbortError')return 'cancel';if(e.name==='NotAllowedError')return shareLater(file)}
+  }
+  dl(blob,name);return 'download';
+}
+async function saveCopy(){
+  if(!pages.length)return;
+  const b=$('#copy'),old=b.textContent;b.disabled=true;b.textContent='Preparing…';
+  try{
+    const bytes=await buildPdf({embed:true}),r=await shareFile(new Blob([bytes],{type:'application/pdf'}),fname);
+    if(r!=='cancel'){A.unsaved=false;nagT=Date.now();draftSave();$('#nag').hidden=true}
+  }catch(err){alert('Could not save a copy: '+err.message)}
+  b.disabled=false;b.textContent=old;
+}
+$('#copy').onclick=saveCopy;
+$('#copy').hidden=!(navigator.canShare&&touchy());
+// Reminder every ~5 minutes while there are changes that only live in this browser.
+function folderOn(){return !!(A.dir&&A.dirOk)}
+setInterval(()=>{
+  const n=$('#nag');
+  if(!pages.length||!A.unsaved){n.hidden=true;return}
+  if(folderOn()||document.hidden||document.querySelector('dialog[open]')||!n.hidden)return;
+  if(Date.now()-nagT<300000)return;
+  const canCopy=!$('#copy').hidden;
+  $('#nags').textContent=canCopy?'Save a copy':'Save PDF';$('#nags').onclick=()=>{n.hidden=true;nagT=Date.now();(canCopy?saveCopy:save)()};
+  $('#nagt').textContent="You have changes that aren't saved to a file yet.";
+  n.hidden=false;
+},15000);
+$('#nagl').onclick=()=>{$('#nag').hidden=true;nagT=Date.now()};
+// Install / offline
+let dip=null;const standalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;if(!standalone())$('#inst').hidden=false});
+addEventListener('appinstalled',()=>{$('#inst').hidden=true});
+if(ios&&!standalone())$('#inst').hidden=false;
+$('#inst').onclick=async()=>{
+  if(dip){dip.prompt();try{await dip.userChoice}catch(e){}dip=null;$('#inst').hidden=true;return}
+  $('#insb').innerHTML=ios?'<ol><li>Tap the <strong>Share</strong> button (square with an arrow) in Safari.</li><li>Scroll down and tap <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Add</strong>.</li></ol><p class="mut">It then opens like an app and works with no signal. The Home Screen app keeps its own signatures and drafts, separate from Safari, so use Back up in Signatures to copy yours across.</p>':'<p>Use your browser menu and choose <strong>Install app</strong> (or <strong>Add to Home screen</strong>).</p>';
+  $('#ins').showModal();
+};
+$('#insx').onclick=()=>$('#ins').close();
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
 if(!ph){initFile();initAutosave();renderDrafts()}
 </script>
 </body>
