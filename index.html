@@ -36,9 +36,23 @@ button:disabled{opacity:.5;cursor:wait}
 header label.f{display:flex;align-items:center;gap:5px;color:var(--mute)}
 input[type=number]{width:54px;background:#1d2332;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit}
 input[type=color]{width:32px;height:28px;padding:0;border:1px solid var(--line);border-radius:6px;background:none;cursor:pointer}
-main{display:grid;grid-template-columns:150px 1fr;min-height:0;position:relative}
-aside{overflow:auto;padding:12px 0;border-right:1px solid var(--line);background:#1d2332}
-#view{overflow:auto;padding:18px 12px}
+main{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto 1fr;min-height:0;position:relative}
+#side{display:contents}
+#sidetop{grid-row:1;grid-column:1;width:150px;box-sizing:border-box;display:flex;gap:6px;align-items:center;padding:8px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:#1d2332;position:relative;z-index:2}
+#sidetop .b{flex:1;text-align:center;white-space:nowrap}
+#sidetg{flex:none;padding:5px 9px;font-size:16px;line-height:1}
+aside{grid-row:2;grid-column:1;width:150px;box-sizing:border-box;overflow:auto;padding:12px 0;min-height:0;border-right:1px solid var(--line);background:#1d2332}
+#side.closed #sidetop{width:auto;justify-self:start;border-right:0;border-bottom:0;background:none;grid-column:1/-1}
+#side.closed aside{display:none}
+#side.closed ~ #view{grid-column:1/-1}
+#side.closed #sidetg{font-size:14px;padding:5px 9px}
+#view{grid-row:2;grid-column:2}
+#ctxm{position:fixed;z-index:60;background:#232b3d;border:1px solid var(--line);border-radius:8px;padding:4px;min-width:170px;box-shadow:0 8px 24px #0008}
+#ctxm button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:6px 10px;border-radius:5px;font:inherit;cursor:pointer}
+#ctxm button:hover{background:var(--acc);color:#fff}
+#ctxm hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+header .narrow-only{display:none!important}
+#view{overflow:auto;padding:18px 12px;min-height:0}
 #empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;color:var(--mute);pointer-events:none}
 #empty[hidden]{display:none}
 #empty p{margin:4px 0}
@@ -98,10 +112,17 @@ body.phone #ph{position:fixed;inset:0;display:flex;flex-direction:column;align-i
 #fq{width:190px;background:#1d2332;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font:inherit}
 #fc{color:var(--mute);font-size:12px;min-width:74px}
 #fb button{padding:4px 9px}
-#asb.warn{border-color:#e0a030;color:#ffd27a}
+#asb{background:#2d4f3c;border-color:#3d6a50;color:#fff}
+#asb.both{background:#36b36b;border-color:#36b36b}
+#asb small,#asb.both small{color:#d6efe0}
+#save,#save.pri{background:#36b36b;border-color:#36b36b;color:#fff;font-weight:600}
+#save:hover{background:#45c97c}
+#asb.warn{background:#3a3020;border-color:#e0a030;color:#ffd27a}
 #asb{display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.15;padding-top:3px;padding-bottom:3px}
 #asb small{font-size:10px;color:var(--mute)}
 #asb.warn small{color:#e8c27a}
+#hspace{flex:1}
+.grp{display:inline-flex;gap:8px;align-items:center;flex:none}
 #dr{pointer-events:auto;margin-top:18px;text-align:left}
 #dr p{margin:0 0 8px;text-align:center}
 #dr p.sec{margin-top:16px}
@@ -158,6 +179,12 @@ header output{min-width:34px;color:var(--text);font-size:12px}
 .scg td.s{font-size:10px;line-height:1;text-align:center}
 .scg tr.om{color:#888}
 @media(max-width:640px){.scr{flex-wrap:wrap}}
+.b[data-tool]{background:#fff;color:#111;border-color:#c9cfdd}
+.b[data-tool]:hover{background:#eaf0ff}
+.b[data-tool].on{background:var(--acc);border-color:var(--acc);color:#fff}
+.b[data-tool].on:hover{background:#7aa0ff}
+.b svg.ic .ul{fill:var(--ulc,transparent);stroke:#0005;stroke-width:.8}
+.b.on svg.ic .ul{stroke:#fff}
 .b svg.ic{width:16px;height:16px;vertical-align:-3px;margin-right:5px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .pen{display:flex;align-items:center;gap:8px;color:var(--mute);font-size:12px;margin-top:10px}
 .pen>b{font-weight:500;min-width:62px;color:var(--text)}
@@ -167,7 +194,7 @@ header output{min-width:34px;color:var(--text);font-size:12px}
 .fw svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .fw svg polygon{fill:#8590aa}
 .fw .dot{position:absolute;top:50%;border-radius:50%;background:var(--acc);border:2px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-sizing:content-box}
-@media(max-width:640px){main{grid-template-columns:1fr}aside{display:none}}
+@media(max-width:640px){main{grid-template-columns:1fr;grid-template-rows:1fr}#side{display:none}#view{grid-column:1;grid-row:1}header .narrow-only{display:inline-flex!important}}
 #nag{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bar,0px) + env(safe-area-inset-bottom,0px) + 14px);z-index:40;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;background:var(--panel);border:1px solid var(--acc);border-radius:10px;padding:10px 14px;box-shadow:0 6px 24px #000b;width:max-content;max-width:94vw}
 #nag[hidden],#inst[hidden],#copy[hidden]{display:none}
 .feel{display:flex;align-items:center;gap:8px;color:var(--mute);font-size:12px;margin-top:10px}
@@ -191,7 +218,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
   header [data-tool]{order:1}
   header #cbtn{order:2}header #undo{order:3}header #redo{order:4}header #save{order:5}header #copy{order:6}
   header label[for=f]{order:7}header label[for=f2]{order:8}header #fbtn{order:9}header #rvb{order:10}
-  header #hlt{order:5}header #scb{order:9}header #ocr{order:11}header #flat{order:11}header #inst{order:12}header #asb{order:13;margin-left:0!important}
+  header #hlt{order:5}header #scb{order:9}header #ocr{order:11}header #flat{order:11}header #inst{order:12}header #asb{order:13}header #hspace{display:none}header .grp{display:contents}
   .b,button{min-height:46px;min-width:46px;padding:8px 14px;font-size:15px;display:inline-flex;align-items:center;justify-content:center}
   header label.f{min-height:46px}
   input[type=number]{width:66px;height:46px;font-size:16px}
@@ -206,40 +233,45 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
 <header>
   <h1>Hoedobe</h1>
   <label class="b pri" for="f">Open PDF</label>
-  <label class="b" for="f2">Add pages</label>
+  <label class="b narrow-only" for="f2">Add pages</label>
   <input type="file" id="f" accept="application/pdf" hidden>
   <input type="file" id="f2" accept="application/pdf" multiple hidden>
   <span class="sep"></span>
   <button class="b on" data-tool="select" title="Select / move (V or F1)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l12 7.5-5.3 1.6L9.4 17.5z" fill="currentColor"/></svg>Select</button>
-  <button class="b" data-tool="text" title="Text (T or F2)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M12 9v7"/></svg>Text</button>
-  <button class="b" data-tool="draw" title="Draw (D or F3)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4.5L16.5 4a2.1 2.1 0 013 3L8 18.5z"/><path d="M14.5 6l3 3"/></svg>Draw</button>
-  <button class="b" data-tool="highlight" title="Highlight (H or F4)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 3.5l5.5 5.5-7.5 7.5H8l-2-2v-4.5z"/><path d="M9 13l2 2"/><rect x="3" y="19.2" width="18" height="2.6" fill="#ffe14d" stroke="none"/></svg>Highlight</button>
-  <button class="b" data-tool="whiteout" title="Whiteout (W or F5)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3.5l5.5 5.5-8.5 9.5H7l-3.5-3.5z"/><path d="M8 11.5l5 5M10 20.5h11"/></svg>Whiteout</button>
+  <button class="b" data-tool="text" title="Text (T or F2)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="15.5" rx="2"/><path d="M8 8h8M12 8v7"/><rect class="ul" x="3" y="20.4" width="18" height="3" rx=".6"/></svg>Text</button>
+  <button class="b" data-tool="draw" title="Draw (D or F3)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.5l1-4L16.5 2.5a2.1 2.1 0 013 3L8 16.5z"/><path d="M14.5 4.5l3 3"/><rect class="ul" x="3" y="20.4" width="18" height="3" rx=".6"/></svg>Draw</button>
+  <button class="b" data-tool="highlight" title="Highlight (H or F4)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 3.5l5.5 5.5-7.5 7.5H8l-2-2v-4.5z"/><path d="M9 13l2 2"/><rect class="ul" x="3" y="20.4" width="18" height="3" rx=".6"/></svg>Highlight</button>
+  <button class="b" data-tool="whiteout" title="Whiteout (W or F5)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2.5l5.5 5.5-8.5 9.5H7l-3.5-3.5z"/><path d="M8 10.5l5 5"/><rect class="ul" x="3" y="20.4" width="18" height="3" rx=".6"/></svg>Whiteout</button>
   <button class="b" data-tool="sign" title="Signature (S or F6)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14c3-8 5-9 5-5s-2 8 1 7 3-5 5-4 1 4 4 2"/><path d="M3 21h18"/></svg>Sign</button>
-  <button class="b" data-tool="edittext" title="Edit existing text: click a line to rewrite it, or drag across words (E or F7)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11M3 11h7M3 16h5"/><path d="M12 20l.8-3.6 6.2-6.3a1.8 1.8 0 012.6 2.6l-6.3 6.2z"/></svg>Edit text</button>
   <button id="cbtn" class="sw" title="Color" aria-label="Color" aria-haspopup="dialog" aria-expanded="false"><span id="csw"></span></button>
   <label class="f" title="Font size (Up / Down arrow keys)">Text <input type="number" id="fs" value="14" min="4" max="120"></label>
   <label class="f" title="Pen size (Left / Right arrow keys)">Pen <input type="number" id="pw" value="2" min="1" max="30"></label>
   <label class="f" title="Opacity of the active tool, or of the selected item">Opacity <input type="range" id="op" min="5" max="100" value="100" aria-label="Opacity"><output id="opo" for="op">100%</output></label>
   <span class="sep"></span>
+  <span class="grp">
+    <button id="fbtn" title="Find text in the PDF (Ctrl+F)">Find</button>
+    <button id="ocr" title="Read the text in scanned pages so Find, copy and the saved PDF all work">Make searchable</button>
+    <button class="b" data-tool="edittext" title="Edit existing text: click a line to rewrite it, or drag across words (E or F7)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11M3 11h7M3 16h5"/><path d="M12 20l.8-3.6 6.2-6.3a1.8 1.8 0 012.6 2.6l-6.3 6.2z"/></svg>Edit text</button>
+  </span>
+  <span class="sep"></span>
   <button id="hlt" hidden title="Switch the text under this highlight colour between white and black, everywhere in the PDF (or double-click the highlight)">Text: white</button>
   <button id="scb" hidden title="Script mode: color the characters, mark scenes, build a cast sheet">Script</button>
-  <button id="fbtn" title="Find text in the PDF (Ctrl+F)">Find</button>
   <button id="undo" title="Undo (Ctrl+Z)">Undo</button>
   <button id="redo" title="Redo (Ctrl+Y or Ctrl+Shift+Z)">Redo</button>
   <button id="rvb" title="Remove every edit and show the original. You can still undo it.">Revert</button>
   <button id="zo" title="Zoom out" aria-label="Zoom out">−</button>
   <span id="z">130%</span>
   <button id="zi" title="Zoom in" aria-label="Zoom in">+</button>
-  <button id="asb" title="Autosave settings" style="margin-left:auto">Autosave: on</button>
-  <button id="ocr" title="Read the text in scanned pages so Find, copy and the saved PDF all work">Make searchable</button>
+  <span id="hspace"></span>
   <button id="flat" title="Bake everything into a plain PDF: fields and edits become fixed, no undo data. Doesn't affect autosaves.">Flatten &amp; export</button>
   <button id="inst" hidden title="Install Hoedobe as an app so it opens on its own and works offline">Install app</button>
   <button id="copy" hidden title="Send a copy to Files, Mail, AirDrop and so on">Save a copy</button>
-  <button id="save" class="pri">Save PDF</button>
+  <button id="asb" title="Autosave settings">Autosave: on</button>
+  <button id="save">Save PDF</button>
 </header>
 <main>
-  <aside id="thumbs" aria-label="Pages"></aside>
+  <div id="side"><div id="sidetop"><label class="b" for="f2" title="Add pages from another PDF">Add pages</label><button id="sidetg" title="Hide the pages panel" aria-label="Hide the pages panel" aria-expanded="true">‹</button></div>
+  <aside id="thumbs" aria-label="Pages"></aside></div>
   <div id="view"></div>
   <div id="empty"><p><strong>Drop a PDF here</strong></p><p>or choose Open PDF. Files stay in your browser.</p><div id="dr"></div></div>
 </main>
@@ -425,7 +457,7 @@ async function paint(el){
 function build(){
   const vs=V.scrollTop,ts=T.scrollTop;
   sel=null;hits=[];cur=-1;V.innerHTML=T.innerHTML='';
-  $('#empty').hidden=pages.length>0;
+  $('#empty').hidden=pages.length>0;try{chip()}catch(e){}
   $('#z').textContent=Math.round(scale*100)+'%';
   pages.forEach((p,i)=>{
     const [W,H]=dims(p);
@@ -474,7 +506,8 @@ function overlay(i){
       if(isSel(k))s+=`<rect x="${u}" y="${v}" width="${a.w}" height="${a.h}" fill="none" stroke="#5b8cff" stroke-dasharray="4" pointer-events="none"/><circle class="rs" data-k="${k}" cx="${u+a.w}" cy="${v+a.h}" r="7" fill="#5b8cff"/>`;
     }else if(a.t=='sq'){
       const [x,y,w,h]=box(a.x,a.y,a.w,a.h);
-      s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${a.c}"${a.ol?' stroke="#000" stroke-width="1.1"':''}/>`;
+      if(a.sk){const f=w/11;s+=`<g transform="translate(${x} ${y}) scale(${f})" fill="#000" stroke="none"><path d="M0 3.5H2.4L5.6 1V9L2.4 6.5H0Z"/><path d="M7.1 3.2Q8.5 5 7.1 6.8M8.7 1.7Q11.3 5 8.7 8.3" fill="none" stroke="#000" stroke-width="1.1" stroke-linecap="round"/></g>`}
+      else s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${a.c}"/>`;
     }else if(a.t=='path'){
       s+=`<polyline data-k="${k}" class="a${isSel(k)}" fill="none" stroke="${a.c}" stroke-opacity="${oa(a)}" stroke-width="${a.s}" stroke-linecap="round" stroke-linejoin="round" points="${a.p.map(q=>fwd(p,q[0],q[1]).join(',')).join(' ')}"/>`;
     }
@@ -490,7 +523,7 @@ function overlay(i){
     tx.append(d);
   });
   // Black text-tool text that sits on a white-text highlight turns white too.
-  const wh=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c)=='w');
+  const wh=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c,oa(a))=='w');
   if(wh.length){
     const wb=wh.map(a=>box(a.x,a.y,a.w,a.h));
     tx.querySelectorAll('.t').forEach(d=>{
@@ -525,14 +558,27 @@ function edit(i,k,fresh){
   };
 }
 
+function paintToolUL(){
+  document.querySelectorAll('[data-tool]').forEach(b=>{const c=tc[b.dataset.tool];if(c)b.style.setProperty('--ulc',c)});
+}
 function setTool(t){
   tool=t;document.body.className='tool-'+t;
   document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('on',b.dataset.tool==t));
   if(COLORED.includes(t))colTool=t;
-  syncUI();
+  syncUI();paintToolUL();
 }
+paintToolUL();
 document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>b.dataset.tool=='sign'?openSig():setTool(b.dataset.tool));
 
+// ---- Pages panel: collapse and reopen ----
+function setSide(open){
+  $('#side').classList.toggle('closed',!open);
+  const b=$('#sidetg');b.textContent=open?'‹':'› See pages';
+  b.title=open?'Hide the pages panel':'Show the pages panel';b.setAttribute('aria-label',b.title);b.setAttribute('aria-expanded',open);
+  try{localStorage.setItem('hoedobe.pages',open?'1':'0')}catch(e){}
+}
+$('#sidetg').onclick=()=>setSide($('#side').classList.contains('closed'));
+try{if(localStorage.getItem('hoedobe.pages')==='0')setSide(false)}catch(e){}
 // ---- Colors and opacity ----
 const COLORED=['text','draw','highlight','whiteout'],OPAQ=['text','draw','sign','highlight'];
 const opv={text:1,draw:1,sign:1,highlight:.8};
@@ -579,6 +625,7 @@ function noteUse(c){
 }
 function markCur(h){document.querySelectorAll('#cp .cg button[data-c]').forEach(b=>b.classList.toggle('cur',b.dataset.c==h))}
 function paintColorUI(h,src){
+  paintToolUL();
   $('#csw').style.background=h;$('#cpsw').style.background=h;
   if(src!='hex')$('#chex').value=h;
   const [H,S,L]=src=='hsl'?[+$('#ch').value,+$('#cs').value,+$('#cl').value]:hexHsl(h);
@@ -611,7 +658,8 @@ function applyColor(c){setColor(c);cSnap=false;paintColorUI(c)}
 function openCP(){
   const cp=$('#cp'),b=$('#cbtn').getBoundingClientRect();
   cp.hidden=false;renderSwatches();paintColorUI(curColor());
-  cp.style.top=(b.top>innerHeight/2?Math.max(8,b.top-cp.offsetHeight-8):b.bottom+6)+'px';
+  const ht=document.querySelector('header').getBoundingClientRect().top;
+  cp.style.top=(b.top>innerHeight/2?Math.max(8,Math.min(b.top,ht)-cp.offsetHeight-8):b.bottom+6)+'px';
   cp.style.left=Math.max(8,Math.min(b.left,innerWidth-cp.offsetWidth-8))+'px';
   $('#cbtn').setAttribute('aria-expanded','true');
 }
@@ -775,6 +823,25 @@ T.addEventListener('click',e=>{
   if(b.dataset.a=='rot')pages[i].rot=(pages[i].rot+90)%360;else pages.splice(i,1);
   build();
 });
+function ctxClose(){const m=document.getElementById('ctxm');if(m)m.remove()}
+function movePage(i,to){to=Math.max(0,Math.min(pages.length-1,to));if(to===i)return;snap();const [m]=pages.splice(i,1);pages.splice(to,0,m);build();
+  const n=V.children[to];if(n)n.scrollIntoView({block:'nearest'})}
+T.addEventListener('contextmenu',e=>{
+  const th=e.target.closest('.th');if(!th)return;e.preventDefault();ctxClose();
+  const i=+th.dataset.i,n=pages.length,m=document.createElement('div');m.id='ctxm';
+  const items=[];
+  if(i>0){[1,5,10].forEach(k=>{if(i-k>=0&&(k==1||i-k>0))items.push(['Move up '+k,()=>movePage(i,i-k)])});items.push(['Move to top',()=>movePage(i,0)])}
+  if(i<n-1){[1,5,10].forEach(k=>{if(i+k<=n-1&&(k==1||i+k<n-1))items.push(['Move down '+k,()=>movePage(i,i+k)])});items.push(['Move to bottom',()=>movePage(i,n-1)])}
+  items.push(null,['Rotate',()=>{snap();pages[i].rot=(pages[i].rot+90)%360;build()}]);
+  if(n>1)items.push(['Delete page',()=>{snap();pages.splice(i,1);build()}]);
+  items.forEach(it=>{if(!it){m.appendChild(document.createElement('hr'));return}
+    const b=document.createElement('button');b.textContent=it[0];b.onclick=()=>{ctxClose();it[1]()};m.appendChild(b)});
+  document.body.appendChild(m);
+  m.style.left=Math.min(e.clientX,innerWidth-m.offsetWidth-6)+'px';m.style.top=Math.min(e.clientY,innerHeight-m.offsetHeight-6)+'px';
+});
+addEventListener('pointerdown',e=>{if(!e.target.closest('#ctxm'))ctxClose()},true);
+addEventListener('keydown',e=>{if(e.key=='Escape')ctxClose()},true);
+addEventListener('resize',ctxClose);
 T.addEventListener('dragstart',e=>{
   const th=e.target.closest('.th');
   if(th){from=+th.dataset.i;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','')}
@@ -1434,7 +1501,7 @@ function chip(){
   else if(folderOk&&A.lastFile)sub='Saved in browser and locally';
   else if(folderOk)sub='In browser · folder ready';
   else sub=A.lastDraft?'Saved in browser':'In browser';
-  b.innerHTML='<span></span><small></small>';b.firstChild.textContent=t;b.lastChild.textContent=sub;b.classList.toggle('warn',warn);
+  b.innerHTML='<span></span><small></small>';b.firstChild.textContent=t;b.lastChild.textContent=sub;b.classList.toggle('warn',warn);b.classList.toggle('both',!warn&&folderOk&&!!A.lastFile);
   const st=$('#ast');
   if(st)st.textContent=[A.dir?'Folder: '+A.dir.name+(A.dirOk?'':' (needs your permission)'):'',A.lastName?'Last file: '+A.lastName:'',A.err?'Problem: '+A.err:''].filter(Boolean).join('   ');
 }
@@ -1505,8 +1572,11 @@ async function buildPdf(opts={}){
           cp.drawRectangle({x:Math.min(x1,x2),y:Math.min(y1,y2),width:Math.abs(x2-x1),height:Math.abs(y2-y1),color:col(a.c),borderWidth:0});
         }else if(a.t=='sq'){
           const [x1,y1]=P(a.x,a.y),[x2,y2]=P(a.x+a.w,a.y+a.h),o={x:Math.min(x1,x2),y:Math.min(y1,y2),width:Math.abs(x2-x1),height:Math.abs(y2-y1),color:col(a.c),borderWidth:0};
-          if(a.ol){o.borderColor=rgb(0,0,0);o.borderWidth=1.1}
-          cp.drawRectangle(o);
+          if(a.sk){const f=a.w/11,K=rgb(0,0,0),X=Math.min(x1,x2),Y=Math.max(y1,y2);
+            cp.drawSvgPath('M0 3.5 H2.4 L5.6 1 V9 L2.4 6.5 H0 Z',{x:X,y:Y,scale:f,color:K,borderWidth:0});
+            cp.drawSvgPath('M7.1 3.2 Q8.5 5 7.1 6.8',{x:X,y:Y,scale:f,borderColor:K,borderWidth:1.1,borderLineCap:1});
+            cp.drawSvgPath('M8.7 1.7 Q11.3 5 8.7 8.3',{x:X,y:Y,scale:f,borderColor:K,borderWidth:1.1,borderLineCap:1})}
+          else cp.drawRectangle(o);
         }else if(a.t=='path'){
           cp.drawSvgPath('M'+a.p.map(q=>pt(q[0],q[1])).join(' L'),{x:0,y:0,scale:1,borderColor:col(a.c),borderWidth:a.s,borderOpacity:oa(a),borderLineCap:1});
         }else if(a.t=='img'){
@@ -1525,7 +1595,7 @@ async function buildPdf(opts={}){
       }
       for(const g of Object.values(groups))cp.drawSvgPath(g.d,{x:0,y:0,scale:1,color:col(g.c),opacity:g.o,blendMode:BlendMode.Multiply});
       // Highlights set to white text: the page's dark text inside them is redrawn white.
-      const whl=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c)=='w');
+      const whl=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c,oa(a))=='w');
       for(const a of whl){
         const pt=await inkPatch(p,pg,a,P);if(!pt)continue;
         const im=await out.embedPng(pt.png);cp.drawImage(im,{x:pt.x,y:pt.y,width:pt.w,height:pt.h});
@@ -1536,7 +1606,7 @@ async function buildPdf(opts={}){
         let tcol=col(a.c);
         if(isBlackInk(a.c)){
           const lines=a.text.split('\n'),tw=Math.max(...lines.map(l=>tf.widthOfTextAtSize(l.replace(/[^\x20-\x7E\u00A0-\u00FF]/g,'?'),a.s)));
-          if(overlapFrac([a.x,a.y,tw,lines.length*a.s*1.2],p.ann.filter(q=>q.t=='rect'&&q.hl&&inkMode(q.c)=='w').map(q=>[q.x,q.y,q.w,q.h]))>=.5)tcol=rgb(1,1,1);
+          if(overlapFrac([a.x,a.y,tw,lines.length*a.s*1.2],p.ann.filter(q=>q.t=='rect'&&q.hl&&inkMode(q.c,oa(q))=='w').map(q=>[q.x,q.y,q.w,q.h]))>=.5)tcol=rgb(1,1,1);
         }
         a.text.split('\n').forEach((ln,j)=>{
           const [x,y]=vp.convertToPdfPoint(u,v+a.s*(0.94+j*1.2));
@@ -1814,7 +1884,11 @@ $('#oc').addEventListener('cancel',()=>{if(ocrRun)ocrRun.stop=true});
 // the page's dark text inside its highlights is redrawn white. Applies to every highlight of that colour.
 let hlInk=lget('hoedobe.hlink');if(!hlInk||typeof hlInk!='object')hlInk={};
 const hexRgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
-function inkMode(c){c=(c||'').toLowerCase();if(hlInk[c])return hlInk[c];return HEX.test(c)&&hexHsl(c)[2]<=40?'w':'k'}
+// Automatic choice: the highlight multiplies over white paper, so work out the colour it really shows
+// (at its own opacity) and pick whichever of black or white ink contrasts better against it.
+function inkMode(c,o){c=(c||'').toLowerCase();if(hlInk[c])return hlInk[c];if(!HEX.test(c))return'k';
+  o=o==null?.8:o;const L=hexRgb(c).map(v=>{v=(255*(1-o)+v*o)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)}).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
+  return L<.179?'w':'k'}
 function isBlackInk(h){if(!HEX.test(h||''))return false;const [r,g,b]=hexRgb(h);return Math.max(r,g,b)-Math.min(r,g,b)<=40&&(r*.299+g*.587+b*.114)<=110}
 function overlapFrac(t,rs){
   const A=t[2]*t[3];if(!(A>0))return 0;let sum=0;
@@ -1839,7 +1913,7 @@ function inkMask(el){
 }
 function paintInk(i){
   const el=V.children[i],cv=el&&el.querySelector('canvas.ink'),p=pages[i];if(!cv||!p)return;
-  const wh=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c)=='w');
+  const wh=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c,oa(a))=='w');
   if(!wh.length){if(cv.width>1){cv.width=1;cv.height=1}return}
   const m=inkMask(el);if(!m)return;
   const [W]=dims(p),kk=m.w/W;
@@ -1889,17 +1963,17 @@ async function inkPatch(p,pg,a,P){
   patchCache.set(key,res);if(patchCache.size>60)patchCache.delete(patchCache.keys().next().value);
   return res;
 }
-function toggleHlInk(c){
-  c=c.toLowerCase();const now=inkMode(c)=='w'?'k':'w';hlInk[c]=now;lset('hoedobe.hlink',hlInk);
+function toggleHlInk(c,o){
+  c=c.toLowerCase();const now=inkMode(c,o)=='w'?'k':'w';hlInk[c]=now;lset('hoedobe.hlink',hlInk);
   pages.forEach((_,i)=>overlay(i));hlBtn();touch();
   toast(`Text on every ${c} highlight is now ${now=='w'?'white':'black'}.`);
 }
 function hlBtn(){
   const b=$('#hlt');if(!b)return;
   const a=tool=='select'?selAnn():null,on=!!(a&&a.t=='rect'&&a.hl);
-  b.hidden=!on;if(on)b.textContent='Text: '+(inkMode(a.c)=='w'?'white':'black');
+  b.hidden=!on;if(on)b.textContent='Text: '+(inkMode(a.c,oa(a))=='w'?'white':'black');
 }
-$('#hlt').onclick=()=>{const a=selAnn();if(a&&a.t=='rect'&&a.hl)toggleHlInk(a.c)};
+$('#hlt').onclick=()=>{const a=selAnn();if(a&&a.t=='rect'&&a.hl)toggleHlInk(a.c,oa(a))};
 // Double-click (or double-tap) a highlight. The page redraws on the first press, so browsers never send a
 // dblclick event; this watches for two quick presses in the same spot and finds the highlight by position.
 let lastDown={t:0,x:0,y:0};
@@ -1911,7 +1985,7 @@ V.addEventListener('pointerdown',e=>{
   const el=e.target.closest('.pg'),p=el&&pages[+el.dataset.i];if(!p)return;
   const r=el.getBoundingClientRect(),[x,y]=inv(p,(e.clientX-r.left)/scale,(e.clientY-r.top)/scale);
   for(let k=p.ann.length-1;k>=0;k--){const a=p.ann[k];
-    if(a.t=='rect'&&a.hl&&x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h){toggleHlInk(a.c);return}}
+    if(a.t=='rect'&&a.hl&&x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h){toggleHlInk(a.c,oa(a));return}}
 },true);
 
 // ---- Script mode: recognise a screenplay, find characters and scenes, colour them, build a cast sheet ----
@@ -2177,16 +2251,19 @@ function scSquares(sc,order,add){
   if(sc.om)return;
   const ids=order.filter(c=>sc.pr.has(c.id));if(!ids.length)return;
   const p=pages[sc.pi];if(!p)return;
-  const [t,b]=lineBox(sc.L),mid=(t+b)/2,size=ids.length>12?5.5:6.5,g=1.6;
+  const [t,b]=lineBox(sc.L),mid=(t+b)/2,size=ids.length>12?6:7.2,g=1.8,ik=size*1.2;
   const xr=Math.min(sc.rlim-5,p.w-22),xs=sc.hx1+8;
   const cap=(a,z)=>Math.max(0,Math.floor((z-a+g)/(size+g)));
   let c0=cap(xs,xr);if(c0<ids.length&&c0<4)c0=0;
   const inline=ids.slice(0,Math.min(ids.length,c0)),rest=ids.slice(inline.length);
-  const put=(list,cy)=>list.forEach((c,k)=>add(sc.pi,{t:'sq',x:xr-(list.length-k)*(size+g)+g,y:cy-size/2,w:size,h:size,c:c.color,ol:sc.sp.has(c.id)?1:0,sc:c.id}));
+  const put=(list,cy)=>list.forEach((c,k)=>{const x=xr-(list.length-k)*(size+g)+g;
+    add(sc.pi,{t:'sq',x,y:cy-size/2,w:size,h:size,c:c.color,sc:c.id});
+    if(sc.sp.has(c.id))add(sc.pi,{t:'sq',sk:1,x:x+(size-ik)/2,y:cy+size/2+.7,w:ik,h:ik*.91,c:'#000000',sc:c.id})});
+  const rowH=list=>size+g+(list.some(c=>sc.sp.has(c.id))?ik*.91+.7:0);
   if(inline.length)put(inline,mid);
   if(rest.length){
     const per=Math.max(1,cap(sc.L.x0,xr));
-    for(let r=0,k=0;k<rest.length;r++,k+=per)put(rest.slice(k,k+per),t-size/2-1.5-r*(size+g));
+    let off=0;for(let k=0;k<rest.length;k+=per){const row=rest.slice(k,k+per),h=rowH(row);put(row,t-size/2-1.5-off-(h-size-g));off+=h}
   }
 }
 async function scApply(){
