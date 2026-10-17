@@ -351,14 +351,14 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
 </dialog>
 <dialog id="scd"><h2>Script mode</h2>
   <p id="scs" class="mut" role="status"></p>
-  <div class="scopts"><label><input type="checkbox" id="sco1"> Highlight dialogue</label><label><input type="checkbox" id="sco2"> Highlight names in the action</label><label><input type="checkbox" id="sco3"> Squares at scene headings</label><label>Strength <input type="range" id="sco4" min="20" max="100" aria-label="Highlight strength"></label></div>
+  <div class="scopts"><label><input type="checkbox" id="sco1"> Highlight dialogue</label><label><input type="checkbox" id="sco2"> Highlight names in the action</label><label><input type="checkbox" id="sco3"> Squares at scene headings</label><label title="Wherever one of these highlights covers black script text, that text is redrawn white. Nothing else changes, and the colors stay at full strength."><input type="checkbox" id="sco4"> Turn script text white under highlights</label></div>
   <p class="mut" style="font-size:12px;margin:4px 0">Drag a row by the dots (or use the arrows) to set the order. The same order is used for the squares and the cast sheet columns.</p>
   <div id="sct"></div>
   <div class="row"><input id="scadd" placeholder="Add a name Hoedobe missed" aria-label="Add a character name" autocomplete="off"><button id="scaddb">Add character</button></div>
   <details id="scam"><summary>Needs your decision (<span id="scan">0</span>)</summary><p class="mut" style="font-size:12px">A first name in the action that fits more than one character, and nobody in the scene settles it.</p><div id="scal"></div></details>
   <details id="scgd"><summary>Cast sheet preview (hover a scene for its details)</summary><div id="scgrid"></div></details>
   <label class="feel" style="margin-top:8px"><input type="checkbox" id="scidx" style="flex:none"> Add scene index pages (full headings and who is in each) to exports</label>
-  <div class="row"><button id="scap" class="pri">Apply to script</button><button id="sccl">Remove marks</button><button id="scex1" style="margin-left:auto" title="The script with highlights and squares, plus the cast sheet pages at the end">Export script + cast sheet</button><button id="scex2" title="Only the cast sheet pages">Export cast sheet only</button><button id="scx">Close</button></div>
+  <div class="row"><button id="scap" class="pri">Apply to script</button><button id="sccl">Remove marks</button><button id="scex1" style="margin-left:auto" title="The script with highlights and squares, plus the cast sheet pages at the end">Export script + cast sheet</button><button id="scex2" title="Only the cast sheet pages">Cast sheet only (PDF)</button><button id="scex3" title="A spreadsheet: one row per scene with the full scene heading, one column per character">Cast sheet (Excel)</button><button id="scx">Close</button></div>
 </dialog>
 <div id="toast" hidden role="status"></div>
 <dialog id="te"><h2>Edit text</h2>
@@ -523,7 +523,7 @@ function overlay(i){
     tx.append(d);
   });
   // Black text-tool text that sits on a white-text highlight turns white too.
-  const wh=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c,oa(a))=='w');
+  const wh=p.ann.filter(a=>a.t=='rect'&&a.hl&&whiteInk(a));
   if(wh.length){
     const wb=wh.map(a=>box(a.x,a.y,a.w,a.h));
     tx.querySelectorAll('.t').forEach(d=>{
@@ -1595,7 +1595,7 @@ async function buildPdf(opts={}){
       }
       for(const g of Object.values(groups))cp.drawSvgPath(g.d,{x:0,y:0,scale:1,color:col(g.c),opacity:g.o,blendMode:BlendMode.Multiply});
       // Highlights set to white text: the page's dark text inside them is redrawn white.
-      const whl=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c,oa(a))=='w');
+      const whl=p.ann.filter(a=>a.t=='rect'&&a.hl&&whiteInk(a));
       for(const a of whl){
         const pt=await inkPatch(p,pg,a,P);if(!pt)continue;
         const im=await out.embedPng(pt.png);cp.drawImage(im,{x:pt.x,y:pt.y,width:pt.w,height:pt.h});
@@ -1606,7 +1606,7 @@ async function buildPdf(opts={}){
         let tcol=col(a.c);
         if(isBlackInk(a.c)){
           const lines=a.text.split('\n'),tw=Math.max(...lines.map(l=>tf.widthOfTextAtSize(l.replace(/[^\x20-\x7E\u00A0-\u00FF]/g,'?'),a.s)));
-          if(overlapFrac([a.x,a.y,tw,lines.length*a.s*1.2],p.ann.filter(q=>q.t=='rect'&&q.hl&&inkMode(q.c,oa(q))=='w').map(q=>[q.x,q.y,q.w,q.h]))>=.5)tcol=rgb(1,1,1);
+          if(overlapFrac([a.x,a.y,tw,lines.length*a.s*1.2],p.ann.filter(q=>q.t=='rect'&&q.hl&&whiteInk(q)).map(q=>[q.x,q.y,q.w,q.h]))>=.5)tcol=rgb(1,1,1);
         }
         a.text.split('\n').forEach((ln,j)=>{
           const [x,y]=vp.convertToPdfPoint(u,v+a.s*(0.94+j*1.2));
@@ -1913,7 +1913,7 @@ function inkMask(el){
 }
 function paintInk(i){
   const el=V.children[i],cv=el&&el.querySelector('canvas.ink'),p=pages[i];if(!cv||!p)return;
-  const wh=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c,oa(a))=='w');
+  const wh=p.ann.filter(a=>a.t=='rect'&&a.hl&&whiteInk(a));
   if(!wh.length){if(cv.width>1){cv.width=1;cv.height=1}return}
   const m=inkMask(el);if(!m)return;
   const [W]=dims(p),kk=m.w/W;
@@ -1963,6 +1963,7 @@ async function inkPatch(p,pg,a,P){
   patchCache.set(key,res);if(patchCache.size>60)patchCache.delete(patchCache.keys().next().value);
   return res;
 }
+const whiteInk=a=>!!a.wt||inkMode(a.c,oa(a))=='w';
 function toggleHlInk(c,o){
   c=c.toLowerCase();const now=inkMode(c,o)=='w'?'k':'w';hlInk[c]=now;lset('hoedobe.hlink',hlInk);
   pages.forEach((_,i)=>overlay(i));hlBtn();touch();
@@ -1971,7 +1972,7 @@ function toggleHlInk(c,o){
 function hlBtn(){
   const b=$('#hlt');if(!b)return;
   const a=tool=='select'?selAnn():null,on=!!(a&&a.t=='rect'&&a.hl);
-  b.hidden=!on;if(on)b.textContent='Text: '+(inkMode(a.c,oa(a))=='w'?'white':'black');
+  b.hidden=!on;if(on)b.textContent='Text: '+(whiteInk(a)?'white':'black');
 }
 $('#hlt').onclick=()=>{const a=selAnn();if(a&&a.t=='rect'&&a.hl)toggleHlInk(a.c,oa(a))};
 // Double-click (or double-tap) a highlight. The page redraws on the first press, so browsers never send a
@@ -1989,7 +1990,7 @@ V.addEventListener('pointerdown',e=>{
 },true);
 
 // ---- Script mode: recognise a screenplay, find characters and scenes, colour them, build a cast sheet ----
-var SC={is:false,sig:'',tok:0,chars:[],rm:[],seeds:[],dec:{},nc:0,opt:{dlg:true,nm:true,sq:true,o:.8,idx:false},scenes:[],amb:[],told:'',dirty:false,busy:''};
+var SC={is:false,sig:'',tok:0,chars:[],rm:[],seeds:[],dec:{},nc:0,opt:{dlg:true,nm:true,sq:true,o:.8,idx:false,wt:false},scenes:[],amb:[],told:'',dirty:false,busy:''};
 const SC_HEAD=/^(INT|EXT|EST|I\s*\/\s*E)(?=[.\s\/-])/i;
 const SC_NUM=/^\d{1,3}[A-Z]{0,2}\*?$/,SC_STAR=/^\*+$/;
 const scTxt=L=>L.chars.map(c=>c.c).join('');
@@ -2273,7 +2274,7 @@ async function scApply(){
   pages.forEach(p=>{p.ann=p.ann.filter(a=>!a.sc)});
   const act=SC.chars.filter(c=>c.on),on=new Map(act.map(c=>[c.id,c]));
   const add=(pi,a)=>{if(pages[pi])pages[pi].ann.push(a)};
-  const rect=(pi,L,x0,x1,c)=>{const [t,b]=lineBox(L);add(pi,{t:'rect',x:x0-1,y:t,w:x1-x0+2,h:b-t,c:c.color,hl:true,o:SC.opt.o,sc:c.id})};
+  const rect=(pi,L,x0,x1,c)=>{const [t,b]=lineBox(L);add(pi,{t:'rect',x:x0-1,y:t,w:x1-x0+2,h:b-t,c:c.color,hl:true,o:SC.opt.o,sc:c.id,...(SC.opt.wt?{wt:1}:{})})};
   for(const sc of SC.scenes){
     if(SC.opt.dlg)for(const bl of sc.blocks){const c=on.get(bl.key);if(c)for(const r of bl.rows)rect(r.pi,r.L,r.L.x0,r.L.x1,c)}
     if(SC.opt.nm)for(const m of sc.mens){const c=m.key&&on.get(m.key);if(c)rect(m.pi,m.L,m.L.chars[m.i0].x0,m.L.chars[m.i1-1].x1,c)}
@@ -2422,7 +2423,7 @@ function scPack(){return{chars:SC.chars.map(c=>({id:c.id,cue:c.cue,name:c.name,c
 function scReset(){SC.chars=[];SC.rm=[];SC.seeds=[];SC.dec={};SC.nc=0;SC.scenes=[];SC.amb=[];SC.is=false;SC.sig='';SC.cc=null;SC.told=''}
 function scLoad(o){
   scReset();if(!o)return;
-  SC.chars=(o.chars||[]).map(c=>({...c}));SC.rm=o.rm||[];SC.seeds=o.seeds||[];SC.dec=o.dec||{};SC.nc=o.nc||0;SC.opt={...SC.opt,...(o.opt||{})};SC.dk=o.dk||'';SC.told=o.told||'';
+  SC.chars=(o.chars||[]).map(c=>({...c}));SC.rm=o.rm||[];SC.seeds=o.seeds||[];SC.dec=o.dec||{};SC.nc=o.nc||0;SC.opt={...SC.opt,...(o.opt||{}),o:.8};SC.dk=o.dk||'';SC.told=o.told||'';
 }
 let scT=0;
 function scSoon(){
@@ -2450,7 +2451,7 @@ function scRender(){
     st.textContent=`Screenplay recognized: ${sp} scenes, ${SC.chars.length} characters.`+(SC.dirty?' Changes below are not on the script yet. Press Apply.':'');
   }
   $('#scap').classList.toggle('pri',!!SC.dirty||!pages.some(p=>p.ann.some(a=>a.sc)));
-  $('#sco1').checked=SC.opt.dlg;$('#sco2').checked=SC.opt.nm;$('#sco3').checked=SC.opt.sq;$('#sco4').value=Math.round(SC.opt.o*100);$('#scidx').checked=SC.opt.idx;
+  $('#sco1').checked=SC.opt.dlg;$('#sco2').checked=SC.opt.nm;$('#sco3').checked=SC.opt.sq;$('#sco4').checked=!!SC.opt.wt;$('#scidx').checked=SC.opt.idx;
   const box=$('#sct');
   box.innerHTML=SC.chars.map((c,i)=>`<div class="scr" data-id="${scE(c.id)}"><span class="grip" title="Drag to reorder">⠿</span><button class="up" title="Move up" aria-label="Move up"${i?'':' disabled'}>↑</button><button class="dn" title="Move down" aria-label="Move down"${i<SC.chars.length-1?'':' disabled'}>↓</button><input type="checkbox" class="on" ${c.on?'checked':''} title="Include in highlights and the cast sheet" aria-label="Include"><input type="color" class="col" value="${c.color}" aria-label="Color"><input class="nm" value="${scE(c.name)}" aria-label="Name" spellcheck="false"><span class="mut inf">${c.n||0} scenes${c.sp?' · '+c.sp+' with dialogue':c.hasLines?'':' · no dialogue'}</span><button class="rmv" title="Remove from the list" aria-label="Remove">✕</button></div>`).join('')||'<p class="mut">No characters found yet.</p>';
   const al=$('#scal');$('#scan').textContent=SC.amb.length;
@@ -2498,7 +2499,7 @@ $('#sccl').onclick=()=>{scClear();toast('Script marks removed (Undo brings them 
 $('#sco1').onchange=e=>{SC.opt.dlg=e.target.checked;scDirtyNow()};
 $('#sco2').onchange=e=>{SC.opt.nm=e.target.checked;scDirtyNow()};
 $('#sco3').onchange=e=>{SC.opt.sq=e.target.checked;scDirtyNow()};
-$('#sco4').oninput=e=>{SC.opt.o=+e.target.value/100;SC.dirty=true;touch();$('#scap').classList.add('pri')};
+$('#sco4').onchange=e=>{SC.opt.wt=e.target.checked;scDirtyNow()};
 $('#scidx').onchange=e=>{SC.opt.idx=e.target.checked;touch()};
 $('#scgd').ontoggle=()=>{if($('#scgd').open)scGrid()};
 $('#scaddb').onclick=()=>{const i=$('#scadd');if(scAddSeed(i.value))i.value=''};
@@ -2550,6 +2551,73 @@ async function scExport(kind){
 }
 $('#scex1').onclick=()=>scExport('all');
 $('#scex2').onclick=()=>scExport('cast');
+// Cast sheet as an Excel workbook, written here with no outside library (an .xlsx is a zip of small XML files).
+function xZip(files){
+  const enc=new TextEncoder(),T=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;T[n]=c>>>0}
+  const crc=b=>{let c=-1;for(let i=0;i<b.length;i++)c=T[(c^b[i])&255]^(c>>>8);return(c^-1)>>>0};
+  const parts=[],cen=[];let off=0;
+  for(const [name,txt] of files){
+    const nb=enc.encode(name),d=enc.encode(txt),cr=crc(d),h=new DataView(new ArrayBuffer(30));
+    h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(10,0,true);h.setUint16(12,0x21,true);h.setUint32(14,cr,true);h.setUint32(18,d.length,true);h.setUint32(22,d.length,true);h.setUint16(26,nb.length,true);
+    parts.push(new Uint8Array(h.buffer),nb,d);
+    const c=new DataView(new ArrayBuffer(46));
+    c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint16(12,0,true);c.setUint16(14,0x21,true);c.setUint32(16,cr,true);c.setUint32(20,d.length,true);c.setUint32(24,d.length,true);c.setUint16(28,nb.length,true);c.setUint32(42,off,true);
+    cen.push(new Uint8Array(c.buffer),nb);off+=30+nb.length+d.length;
+  }
+  const cl=cen.reduce((n,b)=>n+b.length,0),e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cl,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...cen,new Uint8Array(e.buffer)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+function xBook(sheets){
+  const esc=t=>String(t).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const fills=['<fill><patternFill patternType="none"/></fill>','<fill><patternFill patternType="gray125"/></fill>'],fm=new Map(),xfs=[],xm=new Map();
+  const fillId=c=>{if(!c)return 0;if(!fm.has(c)){fm.set(c,fills.length);fills.push(`<fill><patternFill patternType="solid"><fgColor rgb="FF${c.slice(1).toUpperCase()}"/><bgColor indexed="64"/></patternFill></fill>`)}return fm.get(c)};
+  const st=o=>{o=o||{};const k=JSON.stringify([o.f||'',o.b?1:0,o.bd?1:0,o.rot?1:0,o.c?1:0]);if(!xm.has(k)){xm.set(k,xfs.length+1);
+    xfs.push(`<xf numFmtId="0" fontId="${o.b?1:0}" fillId="${fillId(o.f)}" borderId="${o.bd?1:0}" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment${o.rot?' textRotation="90"':''} vertical="${o.rot?'bottom':'center'}"${o.c?' horizontal="center"':''}/></xf>`)}return xm.get(k)};
+  const col=n=>{let s='';for(n++;n>0;n=Math.floor((n-1)/26))s=String.fromCharCode(65+(n-1)%26)+s;return s};
+  const sheetXml=sh=>{
+    let x='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0">'+(sh.freeze?'<pane xSplit="1" ySplit="1" topLeftCell="B2" activePane="bottomRight" state="frozen"/>':'')+'</sheetView></sheetViews><sheetFormatPr defaultRowHeight="15"/>';
+    x+='<cols>'+sh.widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')+'</cols><sheetData>';
+    sh.rows.forEach((r,ri)=>{x+=`<row r="${ri+1}"${r.ht?` ht="${r.ht}" customHeight="1"`:''}>`;
+      r.cells.forEach((c,ci)=>{const ref=col(ci)+(ri+1),sid=st(c);
+        if(c.v===''||c.v==null)x+=`<c r="${ref}" s="${sid}"/>`;
+        else if(typeof c.v=='number')x+=`<c r="${ref}" s="${sid}"><v>${c.v}</v></c>`;
+        else x+=`<c r="${ref}" s="${sid}" t="inlineStr"><is><t xml:space="preserve">${esc(c.v)}</t></is></c>`});
+      x+='</row>'});
+    x+='</sheetData>'+(sh.filter?`<autoFilter ref="${sh.filter}"/>`:'')+'</worksheet>';return x};
+  const sx=sheets.map(sheetXml);   // builds the style tables as a side effect
+  const styles='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="'+fills.length+'">'+fills.join('')+'</fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFCCCCCC"/></left><right style="thin"><color rgb="FFCCCCCC"/></right><top style="thin"><color rgb="FFCCCCCC"/></top><bottom style="thin"><color rgb="FFCCCCCC"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="'+(xfs.length+1)+'"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'+xfs.join('')+'</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+  const R='http://schemas.openxmlformats.org/officeDocument/2006/relationships',H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+  const files=[
+    ['[Content_Types].xml',H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')+'</Types>'],
+    ['_rels/.rels',H+`<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${R}/officeDocument" Target="xl/workbook.xml"/></Relationships>`],
+    ['xl/workbook.xml',H+`<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="${R}"><sheets>`+sheets.map((s,i)=>`<sheet name="${esc(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')+'</sheets></workbook>'],
+    ['xl/_rels/workbook.xml.rels',H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+sheets.map((_,i)=>`<Relationship Id="rId${i+1}" Type="${R}/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')+`<Relationship Id="rId${sheets.length+1}" Type="${R}/styles" Target="styles.xml"/></Relationships>`],
+    ['xl/styles.xml',styles],...sx.map((x,i)=>['xl/worksheets/sheet'+(i+1)+'.xml',x])];
+  return xZip(files);
+}
+async function scXlsx(){
+  const btn=$('#scex3'),old=btn.textContent;btn.disabled=true;btn.textContent='Working…';
+  try{
+    if(SC.sig!==scSig()){SC.sig=scSig();await scScan()}
+    const chars=SC.chars.filter(c=>c.on),scenes=SC.scenes;
+    if(!chars.length||!scenes.length){toast('Nothing to export yet: turn on at least one character.');return}
+    const base=fname.replace(/-edited\.pdf$|\.pdf$/i,'');
+    const loc=s=>{let h=(s.head||'').replace(/^\s*(INT\.?\s*\/\s*EXT|EXT\.?\s*\/\s*INT|I\s*\/\s*E|INT|EXT|EST)[.\s\/-]*/i,'').trim();
+      const m=h.match(/^(.*\S)\s+[-–—]\s+([^-–—]+)$/);if(m&&s.dn&&m[2].toUpperCase().includes(s.dn.toUpperCase()))h=m[1];return h};
+    const nf=5,hdr=[{v:'Scene',b:1,bd:1},{v:'Page',b:1,bd:1},{v:'I/E',b:1,bd:1},{v:'Scene heading',b:1,bd:1},{v:'D/N',b:1,bd:1},...chars.map(c=>({v:c.name,b:1,bd:1,rot:1,f:c.color}))];
+    const rows=[{cells:hdr,ht:Math.min(220,Math.max(60,Math.max(...chars.map(c=>c.name.length))*6.2+12))}];
+    for(const sc of scenes)rows.push({cells:[{v:sc.num,b:1,bd:1},{v:sc.pi+1,bd:1},{v:sc.om?'OMITTED':sc.ie,bd:1},{v:sc.om?'':loc(sc),bd:1},{v:sc.om?'':sc.dn,bd:1},
+      ...chars.map(c=>{const here=!sc.om&&sc.pr.has(c.id);return{v:here&&sc.sp.has(c.id)?'\u{1F50A}':'',bd:1,c:1,f:here?c.color:''}})]});
+    const w1=[8,6,7,Math.min(90,Math.max(20,...scenes.map(sc=>loc(sc).length+2))),11,...chars.map(()=>4.5)];
+    const k=[{cells:['Character','Color','Scenes','With dialogue'].map(v=>({v,b:1}))},...chars.map(c=>({cells:[{v:c.name},{v:'',f:c.color},{v:c.n||0},{v:c.sp||0}]}))];
+    const col=n=>{let s='';for(n++;n>0;n=Math.floor((n-1)/26))s=String.fromCharCode(65+(n-1)%26)+s;return s};
+    const blob=xBook([{name:'Cast sheet',rows,widths:w1,freeze:true,filter:`A1:${col(nf-1)}${rows.length}`},{name:'Characters',rows:k,widths:[30,8,9,15]}]);
+    await shareFile(blob,base+'-cast-sheet.xlsx');
+  }catch(err){alert('Could not export: '+err.message)}
+  finally{btn.disabled=false;btn.textContent=old}
+}
+$('#scex3').onclick=scXlsx;
 $('#fmc').onclick=()=>{const q=$('#fq').value.trim();if(!q)return;if(!SC.is){toast('Script mode needs a screenplay.');return}if(scAddSeed(q)){scOpen();toast(`Added “${q}” as a character.`)}};
 
 // ---- Phone: share sheet, reminders, install, offline ----
@@ -2565,7 +2633,7 @@ function shareLater(file){
 }
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name||blob.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}
 async function shareFile(blob,name){
-  const file=new File([blob],name,{type:'application/pdf'});
+  const file=new File([blob],name,{type:blob.type||'application/pdf'});
   if(navigator.canShare&&navigator.canShare({files:[file]})){
     try{await navigator.share({files:[file],title:name});return 'shared'}
     catch(e){if(e.name==='AbortError')return 'cancel';if(e.name==='NotAllowedError')return shareLater(file)}
