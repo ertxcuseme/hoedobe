@@ -1,6 +1,6 @@
 // Hoedobe offline helper. Keeps a copy of the app and its libraries so it opens with no signal.
-const V = 'hoedobe-v1';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+const V = 'hoedobe-v5';
+const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-32.png', './favicon.ico', './icon-512.png', './apple-touch-icon.png'];
 const LIBS = [
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
@@ -18,7 +18,7 @@ self.addEventListener('fetch', e => {
   const r = e.request;
   if (r.method !== 'GET') return;
   const u = new URL(r.url);
-  const lib = u.hostname === 'cdnjs.cloudflare.com';
+  const lib = u.hostname === 'cdnjs.cloudflare.com' || u.hostname === 'cdn.jsdelivr.net';   // versioned files (including the OCR engine) never change
   if (!lib && u.origin !== location.origin) return;           // phone-signature connection etc. go straight to the network
   if (lib) {                                                   // versioned libraries never change: cache first
     e.respondWith(caches.match(r.url).then(m => m || fetch(r).then(res => { const c = res.clone(); caches.open(V).then(ca => ca.put(r.url, c)); return res; })));

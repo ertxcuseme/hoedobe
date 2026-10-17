@@ -50,6 +50,7 @@ aside{overflow:auto;padding:12px 0;border-right:1px solid var(--line);background
 .a{pointer-events:none}
 .t{position:absolute;white-space:pre;line-height:1.2;font-family:Helvetica,Arial,sans-serif;min-width:1ch;min-height:1.2em;outline:none;pointer-events:none}
 .tool-select .a{pointer-events:visiblePainted;cursor:move}
+.pg canvas.ink{position:absolute;inset:0;pointer-events:none}
 .tool-select .t{pointer-events:auto;cursor:move}
 .t.sel{outline:1px dashed var(--acc)}
 .a.sel{filter:drop-shadow(0 0 2px var(--acc))}
@@ -133,6 +134,13 @@ header output{min-width:34px;color:var(--text);font-size:12px}
 .feel{display:flex;align-items:center;gap:8px;color:var(--mute);font-size:12px;margin-top:10px}
 .feel input{flex:1;min-width:0}
 #sh,#ins{text-align:center}
+body.tool-edittext .pg{touch-action:none;cursor:text}
+.selbox{position:absolute;border:2px dashed var(--acc);background:#5b8cff33;pointer-events:none;z-index:6}
+.linehint{position:absolute;background:#5b8cff22;outline:1px solid #5b8cff99;pointer-events:none;z-index:5}
+#te textarea{width:100%;min-height:96px;background:#1d2332;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px;font-size:16px;resize:vertical}
+#oc progress{width:100%;margin-top:10px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bar,0px) + env(safe-area-inset-bottom,0px) + 18px);z-index:45;background:#000d;color:#fff;border-radius:8px;padding:9px 14px;max-width:92vw;text-align:center}
+#toast[hidden]{display:none}
 #ins ol{text-align:left;margin:10px 0;padding-left:22px}
 /* Phone and tablet: one scrolling toolbar along the bottom, bigger touch targets. */
 @media (pointer:coarse),(max-width:760px){
@@ -144,7 +152,7 @@ header output{min-width:34px;color:var(--text);font-size:12px}
   header [data-tool]{order:1}
   header #cbtn{order:2}header #undo{order:3}header #redo{order:4}header #save{order:5}header #copy{order:6}
   header label[for=f]{order:7}header label[for=f2]{order:8}header #fbtn{order:9}header #rvb{order:10}
-  header #flat{order:11}header #inst{order:12}header #asb{order:13;margin-left:0!important}
+  header #hlt{order:5}header #ocr{order:11}header #flat{order:11}header #inst{order:12}header #asb{order:13;margin-left:0!important}
   .b,button{min-height:46px;min-width:46px;padding:8px 14px;font-size:15px;display:inline-flex;align-items:center;justify-content:center}
   header label.f{min-height:46px}
   input[type=number]{width:66px;height:46px;font-size:16px}
@@ -169,11 +177,13 @@ header output{min-width:34px;color:var(--text);font-size:12px}
   <button class="b" data-tool="highlight" title="Highlight (H or F4)">Highlight</button>
   <button class="b" data-tool="whiteout" title="Whiteout (W or F5)">Whiteout</button>
   <button class="b" data-tool="sign" title="Signature (S or F6)">Sign</button>
+  <button class="b" data-tool="edittext" title="Edit existing text: click a line to rewrite it, or drag across words (E or F7)">Edit text</button>
   <button id="cbtn" class="sw" title="Color" aria-label="Color" aria-haspopup="dialog" aria-expanded="false"><span id="csw"></span></button>
   <label class="f" title="Font size (Up / Down arrow keys)">Text <input type="number" id="fs" value="14" min="4" max="120"></label>
   <label class="f" title="Pen size (Left / Right arrow keys)">Pen <input type="number" id="pw" value="2" min="1" max="30"></label>
   <label class="f" title="Opacity of the active tool, or of the selected item">Opacity <input type="range" id="op" min="5" max="100" value="100" aria-label="Opacity"><output id="opo" for="op">100%</output></label>
   <span class="sep"></span>
+  <button id="hlt" hidden title="Switch the text under this highlight colour between white and black, everywhere in the PDF (or double-click the highlight)">Text: white</button>
   <button id="fbtn" title="Find text in the PDF (Ctrl+F)">Find</button>
   <button id="undo" title="Undo (Ctrl+Z)">Undo</button>
   <button id="redo" title="Redo (Ctrl+Y or Ctrl+Shift+Z)">Redo</button>
@@ -182,6 +192,7 @@ header output{min-width:34px;color:var(--text);font-size:12px}
   <span id="z">130%</span>
   <button id="zi" title="Zoom in" aria-label="Zoom in">+</button>
   <button id="asb" title="Autosave settings" style="margin-left:auto">Autosave: on</button>
+  <button id="ocr" title="Read the text in scanned pages so Find, copy and the saved PDF all work">Make searchable</button>
   <button id="flat" title="Bake everything into a plain PDF: fields and edits become fixed, no undo data. Doesn't affect autosaves.">Flatten &amp; export</button>
   <button id="inst" hidden title="Install Hoedobe as an app so it opens on its own and works offline">Install app</button>
   <button id="copy" hidden title="Send a copy to Files, Mail, AirDrop and so on">Save a copy</button>
@@ -264,6 +275,16 @@ header output{min-width:34px;color:var(--text);font-size:12px}
   <p id="lst" class="mut" style="font-size:12px"></p>
   <p class="mut" style="font-size:12px">Signatures are saved in this browser. Link a file to keep an automatic copy on your computer, or use Back up to save a one-time copy.</p>
 </dialog>
+<div id="toast" hidden role="status"></div>
+<dialog id="te"><h2>Edit text</h2>
+  <label class="feel" style="margin:0 0 8px">Font <select id="tef"><option value="h">Sans (Helvetica)</option><option value="c">Typewriter (Courier)</option><option value="t">Serif (Times)</option></select></label><textarea id="tet" spellcheck="false" aria-label="Replacement text"></textarea>
+  <p class="mut" style="font-size:12px;margin:8px 0 0"><span id="teh"></span> The old text is covered, not erased: it can still be found by search or copy in the saved file.</p>
+  <div class="row"><button id="tex">Cancel</button><button id="tey" class="pri" style="margin-left:auto">Replace text</button></div></dialog>
+<dialog id="oc"><h2>Make searchable</h2>
+  <p id="ocp">Reads the words on scanned pages (English) so Find and copy work and your saved PDF becomes searchable. Pages that already have real text are skipped. The first time it downloads the reading engine, about 15 MB, so you need internet once.</p>
+  <label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="ocall"> Also redo pages that already have text</label>
+  <progress id="ocb" hidden max="1" value="0"></progress><p id="ocs" class="mut" role="status"></p>
+  <div class="row"><button id="ocx">Close</button><button id="ocg" class="pri" style="margin-left:auto">Start</button></div></dialog>
 <div id="nag" hidden role="status"><span id="nagt">You have changes that aren't saved outside this browser.</span><button id="nags" class="pri"></button><button id="nagl">Later</button></div>
 <dialog id="sh"><h2>Your copy is ready</h2><p class="mut">Tap the button to choose where it goes.</p><div class="row" style="justify-content:center"><button id="shg" class="pri">Share / Save…</button><button id="shx">Cancel</button></div></dialog>
 <dialog id="ins"><h2>Install Hoedobe</h2><div id="insb"></div><div class="row" style="justify-content:center"><button id="insx" class="pri">Got it</button></div></dialog>
@@ -322,7 +343,7 @@ async function addFile(f,append){
       catch(e){alert('Could not restore the edits from this file, so it opened as a plain PDF.')}
     }
   }
-  if(append)snap();else{docs=[];pages=[];hist=[];redoS=[];intern.clear();baseline=null;fname=f.name.replace(/\.pdf$/i,'')+'-edited.pdf';newSession(f.name)}
+  if(append)snap();else{docs=[];pages=[];hist=[];redoS=[];intern.clear();baseline=null;fname=f.name.replace(/\.pdf$/i,'')+'-edited.pdf';newSession(f.name);ocr={};clearTextCaches()}
   const d=docs.push({bytes,pdf})-1;
   for(let n=1;n<=pdf.numPages;n++){
     const pg=await pdf.getPage(n),v=pg.getViewport({scale:1});
@@ -344,7 +365,7 @@ async function paint(el){
   const c=el.querySelector('canvas');
   c.width=vp.width;c.height=vp.height;c.style.width=vp.width/r+'px';c.style.height=vp.height/r+'px';
   await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
-  if(!th)forms(el,p,pg);
+  if(!th){el._m=null;el._ready=true;forms(el,p,pg);paintInk(+el.dataset.i)}
 }
 
 function build(){
@@ -356,7 +377,7 @@ function build(){
     const [W,H]=dims(p);
     const el=document.createElement('div');
     el.className='pg';el.dataset.i=i;el.style.width=W*scale+'px';el.style.height=H*scale+'px';
-    el.innerHTML='<canvas></canvas><div class="fm"></div><svg class="ov"></svg><svg class="hl"></svg><div class="tx"></div>';
+    el.innerHTML='<canvas></canvas><div class="fm"></div><svg class="ov"></svg><svg class="hl"></svg><canvas class="ink"></canvas><div class="tx"></div>';
     V.append(el);io.observe(el);
     const th=document.createElement('div');
     th.className='th';th.draggable=true;th.dataset.i=i;th.style.height=H*110/W+'px';
@@ -408,9 +429,19 @@ function overlay(i){
     if(a.t!='text')return;
     const [x,y]=fwd(p,a.x,a.y),d=document.createElement('div');
     d.className='t'+isSel(k);d.dataset.k=k;d.textContent=a.text;
-    d.style.cssText=`left:${x*scale}px;top:${y*scale}px;font-size:${a.s*scale}px;color:${a.c};opacity:${oa(a)}`;
+    d.style.cssText=`left:${x*scale}px;top:${y*scale}px;font-size:${a.s*scale}px;color:${a.c};opacity:${oa(a)};font-family:${fam(a.f)}`;
     tx.append(d);
   });
+  // Black text-tool text that sits on a white-text highlight turns white too.
+  const wh=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c)=='w');
+  if(wh.length){
+    const wb=wh.map(a=>box(a.x,a.y,a.w,a.h));
+    tx.querySelectorAll('.t').forEach(d=>{
+      const a=p.ann[+d.dataset.k];if(!a||!isBlackInk(a.c))return;
+      if(overlapFrac([parseFloat(d.style.left)/scale,parseFloat(d.style.top)/scale,d.offsetWidth/scale,d.offsetHeight/scale],wb)>=.5)d.style.color='#fff';
+    });
+  }
+  paintInk(i);
 }
 
 function edit(i,k,fresh){
@@ -506,6 +537,7 @@ function syncUI(){
   const t=opTarget(),r=$('#op'),v=t?Math.round((t.a?oa(t.a):opv[t.tool])*100):100;
   r.disabled=!t;r.value=v;$('#opo').textContent=t?v+'%':'–';
   if(!$('#cp').hidden)paintColorUI(h);
+  hlBtn();
 }
 function renderSwatches(){
   const mk=(c,i,kind)=>c?`<button type="button" style="background:${c}" data-c="${c}" data-i="${i}" title="${c}" aria-label="${kind} color ${c}"></button>`:`<button type="button" class="empty" disabled aria-hidden="true"></button>`;
@@ -651,7 +683,7 @@ addEventListener('keydown',e=>{
   if(e.key=='Escape'&&!$('#cp').hidden){closeCP();return}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()=='f'&&pages.length){e.preventDefault();openFind();return}
   const plain=!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!document.querySelector('dialog[open]');
-  const FK=plain&&{F1:'select',F2:'text',F3:'draw',F4:'highlight',F5:'whiteout',F6:'sign'}[e.key];
+  const FK=plain&&{F1:'select',F2:'text',F3:'draw',F4:'highlight',F5:'whiteout',F6:'sign',F7:'edittext'}[e.key];
   if(FK){
     e.preventDefault();
     if(e.target.isContentEditable)e.target.blur();
@@ -672,7 +704,7 @@ addEventListener('keydown',e=>{
     snap();const i=sel[0];pages[i].ann.splice(sel[1],1);sel=null;overlay(i);syncUI();return;
   }
   if(e.key.toLowerCase()=='s'&&!e.ctrlKey&&!e.metaKey){openSig();return}
-  const m={v:'select',t:'text',d:'draw',h:'highlight',w:'whiteout'}[e.key.toLowerCase()];
+  const m={v:'select',t:'text',d:'draw',h:'highlight',w:'whiteout',e:'edittext'}[e.key.toLowerCase()];
   if(m&&!e.ctrlKey&&!e.metaKey&&!e.altKey)setTool(m);
 });
 
@@ -1053,6 +1085,7 @@ async function pageText(p){
     items.push({s:str.length,e:str.length+it.str.length,x:Math.min(r[0],r[2]),y:Math.min(r[1],r[3]),w:Math.abs(r[2]-r[0]),h:Math.abs(r[3]-r[1])});
     str+=it.str+(it.hasEOL?'\n':'');
   }
+  for(const w of (ocr[key]||[])){items.push({s:str.length,e:str.length+w[0].length,x:w[1],y:w[2],w:w[3],h:w[4]});str+=w[0]+' '}
   return tcache[key]={str:str.toLowerCase(),items};
 }
 async function runFind(jump){
@@ -1159,13 +1192,13 @@ function packProject(){
   const o={v:1,base:A.base,fname,sid:A.sid,savedAt:Date.now(),nd:docs.length,unsaved:A.unsaved};
   o.cur=pk(cap());o.b0=baseline?pk(baseline):null;o.h=hist.map(pk);o.r=redoS.map(pk);o.S=S;
   const sg={};S.forEach(t=>{const m=/"sid":"([^"]+)"/.exec(t);if(m&&srcs[m[1]])sg[m[1]]=srcs[m[1]]});
-  o.sigs=sg;return o;
+  o.sigs=sg;o.ocr=ocr;o.hlink=hlInk;return o;
 }
 async function applyProject(proj,bytesList,opt={}){
   await ready;
   const nd=[];
   for(const b of bytesList){const bytes=b instanceof Uint8Array?b:new Uint8Array(b);nd.push({bytes,pdf:await pdfjsLib.getDocument({data:bytes.slice()}).promise})}
-  docs=nd;
+  docs=nd;ocr=proj.ocr||{};clearTextCaches();if(proj.hlink){hlInk={...hlInk,...proj.hlink};lset('hoedobe.hlink',hlInk)}
   Object.entries(proj.sigs||{}).forEach(([k,v])=>{srcs[k]=v});
   intern.clear();
   const S=proj.S,up=pk=>pk.map(([m,an])=>[I(S[m]),an.map(i=>I(S[i]))]);
@@ -1338,7 +1371,8 @@ addEventListener('pagehide',()=>{if(A.unsaved)draftSave()});
 async function buildPdf(opts={}){
   {
     const {PDFDocument,StandardFonts,rgb,degrees,BlendMode,setLineJoin,LineJoinStyle}=PDFLib;
-    const out=await PDFDocument.create(),font=await out.embedFont(StandardFonts.Helvetica),src={},emb={},roots=new Map(),touched=new Set();
+    const out=await PDFDocument.create(),font=await out.embedFont(StandardFonts.Helvetica),src={},emb={},roots=new Map(),touched=new Set(),fonts={h:font};
+    const fontFor=async k=>fonts[k||'h']||(fonts[k]=await out.embedFont(k=='c'?StandardFonts.Courier:StandardFonts.TimesRoman));
     const col=h=>rgb(parseInt(h.slice(1,3),16)/255,parseInt(h.slice(3,5),16)/255,parseInt(h.slice(5,7),16)/255);
     for(const p of pages){
       if(!src[p.d])src[p.d]=await PDFDocument.load(docs[p.d].bytes,{ignoreEncryption:true});
@@ -1348,8 +1382,16 @@ async function buildPdf(opts={}){
       const nf=p.fv?Object.keys(p.fv).length:0;
       const pg=await docs[p.d].pdf.getPage(p.n);
       if(!opts.flat)await keepFields(p,pg,cp,roots,touched);
-      if(!p.ann.length&&!(opts.flat&&nf))continue;
       const vp=pg.getViewport({scale:1,rotation:tot});
+      // Words found by "Make searchable": drawn invisibly so Find, copy and other apps can use them.
+      const ow=ocr[p.d+':'+p.n];
+      if(ow&&ow.length)for(const [t,x,y,w,h] of ow){
+        const safe=t.replace(/[^\x20-\x7E\u00A0-\u00FF]/g,'?'),wd=font.widthOfTextAtSize(safe,1);
+        if(!wd)continue;
+        const [u,v]=fwd(p,x,y+h*.8),[px,py]=vp.convertToPdfPoint(u,v);
+        cp.drawText(safe,{x:px,y:py,size:Math.max(2,Math.min(w/wd,h*1.6)),font,color:rgb(0,0,0),opacity:0,rotate:degrees(tot)});
+      }
+      if(!p.ann.length&&!(opts.flat&&nf))continue;
       if(opts.flat&&nf)await flatten(p,pg,cp,vp,tot,font);
       const P=(x,y)=>{const [u,v]=fwd(p,x,y);return vp.convertToPdfPoint(u,v)};
       const f3=n=>n.toFixed(3),pt=(x,y)=>{const q=P(x,y);return f3(q[0])+' '+f3(-q[1])};
@@ -1376,13 +1418,24 @@ async function buildPdf(opts={}){
         g.d+=`M${pt(a.x,a.y)} L${pt(a.x+a.w,a.y)} L${pt(a.x+a.w,a.y+a.h)} L${pt(a.x,a.y+a.h)} Z `;
       }
       for(const g of Object.values(groups))cp.drawSvgPath(g.d,{x:0,y:0,scale:1,color:col(g.c),opacity:g.o,blendMode:BlendMode.Multiply});
+      // Highlights set to white text: the page's dark text inside them is redrawn white.
+      const whl=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c)=='w');
+      for(const a of whl){
+        const pt=await inkPatch(p,pg,a,P);if(!pt)continue;
+        const im=await out.embedPng(pt.png);cp.drawImage(im,{x:pt.x,y:pt.y,width:pt.w,height:pt.h});
+      }
       for(const a of p.ann){
         if(a.t!='text')continue;
-        const [u,v]=fwd(p,a.x,a.y);
+        const [u,v]=fwd(p,a.x,a.y),tf=await fontFor(a.f);
+        let tcol=col(a.c);
+        if(isBlackInk(a.c)){
+          const lines=a.text.split('\n'),tw=Math.max(...lines.map(l=>tf.widthOfTextAtSize(l.replace(/[^\x20-\x7E\u00A0-\u00FF]/g,'?'),a.s)));
+          if(overlapFrac([a.x,a.y,tw,lines.length*a.s*1.2],p.ann.filter(q=>q.t=='rect'&&q.hl&&inkMode(q.c)=='w').map(q=>[q.x,q.y,q.w,q.h]))>=.5)tcol=rgb(1,1,1);
+        }
         a.text.split('\n').forEach((ln,j)=>{
           const [x,y]=vp.convertToPdfPoint(u,v+a.s*(0.94+j*1.2));
           const safe=ln.replace(/[^\x20-\x7E -ÿ]/g,'?');
-          if(safe)cp.drawText(safe,{x,y,size:a.s,font,color:col(a.c),rotate:degrees(tot),opacity:oa(a)});
+          if(safe)cp.drawText(safe,{x,y,size:a.s,font:tf,color:tcol,rotate:degrees(tot),opacity:oa(a)});
         });
       }
     }
@@ -1429,6 +1482,330 @@ async function exportFlat(){
 }
 $('#flat').onclick=exportFlat;
 $('#save').onclick=save;
+
+// ---- Round 3: edit existing text, and "Make searchable" (OCR) ----
+var ocr={};                         // source page ("doc:page") -> words [text,x,y,w,h] in page points, top-left origin
+const lcache={};
+function clearTextCaches(){for(const k in tcache)delete tcache[k];for(const k in lcache)delete lcache[k]}
+function fam(f){return f=='c'?'"Courier New",Courier,monospace':f=='t'?'"Times New Roman",Times,serif':'Helvetica,Arial,sans-serif'}
+let toastT=0;
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,4200)}
+const mctx=document.createElement('canvas').getContext('2d');
+const med=a=>{const b=a.slice().sort((x,y)=>x-y);return b.length?b[b.length>>1]:0};
+// Group loose pieces (pdf.js items or OCR words) into lines, each with a position for every character.
+function groupLines(raw,kind){
+  raw.sort((a,b)=>a.y-b.y||a.x-b.x);
+  const rows=[];
+  for(const it of raw){
+    let r=null;
+    for(let k=rows.length-1;k>=0&&k>=rows.length-8;k--){const q=rows[k];if(Math.abs(q.y-it.y)<=.35*Math.min(q.sz,it.sz)&&Math.abs(q.sz-it.sz)<=.25*q.sz){r=q;break}}
+    if(!r){r={y:it.y,sz:it.sz,f:it.f,its:[]};rows.push(r)}
+    r.its.push(it);
+  }
+  const lines=[];
+  for(const r of rows){
+    r.its.sort((a,b)=>a.x-b.x);
+    let seg=null;
+    for(const it of r.its){
+      const prevEnd=seg?seg.x1:0,gap=seg?it.x-prevEnd:0;
+      if(!seg||gap>2.5*r.sz){seg={y:r.y,sz:r.sz,f:r.f,chars:[],x0:it.x,x1:it.x,kind};lines.push(seg)}
+      else if(gap>.15*r.sz){const l=seg.chars[seg.chars.length-1];if(l&&l.c!=' '&&it.cs[0]&&it.cs[0].c!=' ')seg.chars.push({c:' ',x0:prevEnd,x1:it.x})}
+      for(const c of it.cs)seg.chars.push(c);
+      seg.x1=Math.max(seg.x1,it.x+it.w);
+    }
+  }
+  return lines.filter(l=>l.chars.some(c=>c.c.trim()));
+}
+async function pdfLines(p){
+  const pg=await docs[p.d].pdf.getPage(p.n),tx=await pg.getTextContent(),vp=pg.getViewport({scale:1}),raw=[];
+  for(const it of tx.items){
+    if(typeof it.str!=='string'||!it.str)continue;
+    const tm=pdfjsLib.Util.transform(vp.transform,it.transform),sz=Math.hypot(tm[2],tm[3]);
+    if(!(sz>2)||tm[0]<=0||Math.abs(tm[1])>.02*Math.abs(tm[0]))continue;      // horizontal text only
+    const st=tx.styles&&tx.styles[it.fontName],ff=st&&st.fontFamily||'',f=/mono/i.test(ff)?'c':/(^|[^-])serif/i.test(ff)&&!/sans/i.test(ff)?'t':'h';
+    mctx.font=`${sz}px ${ff||'sans-serif'}`;
+    const tot=mctx.measureText(it.str).width,n=it.str.length,cs=[];
+    for(let i=0;i<n;i++){
+      const a=tot?mctx.measureText(it.str.slice(0,i)).width/tot:i/n,b=tot?mctx.measureText(it.str.slice(0,i+1)).width/tot:(i+1)/n;
+      cs.push({c:it.str[i],x0:tm[4]+it.width*a,x1:tm[4]+it.width*b});
+    }
+    raw.push({x:tm[4],y:tm[5],w:it.width,sz,f,cs});
+  }
+  return groupLines(raw,'pdf');
+}
+function ocrLines(p){
+  const ws=ocr[p.d+':'+p.n]||[];if(!ws.length)return[];
+  const DESC=/[gjpqyQ,;()\[\]]/,hs=med(ws.filter(w=>!DESC.test(w[0])).map(w=>w[4]))||med(ws.map(w=>w[4])),sz=hs*1.38,raw=ws.map(w=>{
+    const n=w[0].length,cs=[...w[0]].map((c,i)=>({c,x0:w[1]+w[3]*i/n,x1:w[1]+w[3]*(i+1)/n}));
+    return{x:w[1],y:w[2]+w[4]-(DESC.test(w[0])?.22*sz:0),w:w[3],sz,f:'h',cs};   // baseline from the bottom of the word box
+  });
+  return groupLines(raw,'ocr');
+}
+async function getLines(p){
+  const k=p.d+':'+p.n;if(lcache[k])return lcache[k];
+  return lcache[k]=[...await pdfLines(p),...ocrLines(p)].sort((a,b)=>a.y-b.y||a.x0-b.x0);
+}
+const lineBox=L=>L.kind=='ocr'?[L.y-L.sz*.95,L.y+L.sz*.35]:[L.y-L.sz*.82,L.y+L.sz*.25];
+function lineAt(lines,x,y){
+  let best=null,bd=1e9;
+  for(const L of lines){
+    const [t,b]=lineBox(L);if(y<t-2||y>b+2||x<L.x0-3||x>L.x1+3)continue;
+    const d=Math.abs(y-(t+b)/2);if(d<bd){bd=d;best=L}
+  }
+  return best;
+}
+// Pick the real background and ink colour from what is drawn on screen.
+function sampleColors(i,L,a){
+  const out={bg:'#ffffff',ink:'#111111'};
+  try{
+    const c=V.children[i].querySelector('canvas'),p=pages[i],[W]=dims(p),k=c.width/(W*scale);
+    const x0=L.chars[a].x0,[t,b]=lineBox(L);
+    const [u1,v1]=fwd(p,x0,t),[u2,v2]=fwd(p,Math.min(L.x1,x0+400),b);
+    const X=Math.max(0,Math.floor(Math.min(u1,u2)*scale*k)),Y=Math.max(0,Math.floor(Math.min(v1,v2)*scale*k));
+    const w=Math.max(1,Math.min(c.width-X,Math.ceil(Math.abs(u2-u1)*scale*k))),h=Math.max(1,Math.min(c.height-Y,Math.ceil(Math.abs(v2-v1)*scale*k)));
+    const d=c.getContext('2d').getImageData(X,Y,w,h).data,bins=new Map();
+    for(let q=0;q<d.length;q+=4){if(d[q+3]<200)continue;const key=(d[q]>>4)<<8|(d[q+1]>>4)<<4|(d[q+2]>>4),e=bins.get(key)||[0,0,0,0];e[0]++;e[1]+=d[q];e[2]+=d[q+1];e[3]+=d[q+2];bins.set(key,e)}
+    let top=null;for(const e of bins.values())if(!top||e[0]>top[0])top=e;
+    if(!top)return out;
+    const bg=[top[1]/top[0],top[2]/top[0],top[3]/top[0]],hx=v=>Math.round(v).toString(16).padStart(2,'0');
+    out.bg='#'+bg.map(hx).join('');
+    let mx=0;const far=[];
+    for(let q=0;q<d.length;q+=4){const dd=Math.hypot(d[q]-bg[0],d[q+1]-bg[1],d[q+2]-bg[2]);far.push([dd,q]);if(dd>mx)mx=dd}
+    if(mx>90){let r=0,g=0,bl=0,n=0;for(const [dd,q] of far)if(dd>=mx*.8){r+=d[q];g+=d[q+1];bl+=d[q+2];n++}out.ink='#'+[r/n,g/n,bl/n].map(hx).join('')}
+  }catch(e){}
+  return out;
+}
+function askEdit(text,f,multi){
+  return new Promise(res=>{
+    const d=$('#te'),t=$('#tet'),sf=$('#tef');t.value=text;t.style.fontFamily=fam(f);sf.value=f;sf.onchange=()=>t.style.fontFamily=fam(sf.value);
+    $('#teh').textContent=multi?'One line per selected line. Ctrl+Enter to apply.':'Enter to apply.';
+    let done=false;const fin=v=>{if(done)return;done=true;try{d.close()}catch(e){}res(v)};
+    $('#tey').onclick=()=>fin({text:t.value,f:sf.value});$('#tex').onclick=()=>fin(null);
+    t.onkeydown=e=>{if(e.key=='Enter'&&(multi?(e.ctrlKey||e.metaKey):!e.shiftKey)){e.preventDefault();fin({text:t.value,f:sf.value})}};
+    d.oncancel=()=>fin(null);
+    d.showModal();t.focus();t.setSelectionRange(t.value.length,t.value.length);
+  });
+}
+// Cover the old words with a patch the colour of the page and put the new words on top, in the same size and style.
+function applyEdit(i,sels,newText,font){
+  const p=pages[i],nl=newText.replace(/\r/g,'').split('\n'),cols=sels.map(s=>sampleColors(i,s.L,s.a));
+  snap();
+  sels.forEach((s,k)=>{
+    const L=s.L,x0=L.chars[s.a].x0,tail=L.chars.slice(s.b).map(c=>c.c).join(''),last=k==sels.length-1;
+    const txt=(last?nl.slice(k).join('\n'):(nl[k]??''))+tail;
+    const [t]=lineBox(L),sz=Math.round(L.sz*10)/10;
+    const [,bt]=lineBox(L),pad=L.kind=='ocr'?2:1;p.ann.push({t:'rect',x:x0-pad,y:t,w:L.x1-x0+2*pad,h:bt-t+(L.kind=='ocr'?0:L.sz*.05),c:cols[k].bg,hl:false});
+    if(txt.trim()){const a={t:'text',x:x0,y:L.y-.94*sz,s:sz,c:cols[k].ink,text:txt},ff=font||L.f;if(ff!='h')a.f=ff;p.ann.push(a)}
+  });
+  overlay(i);
+}
+async function editSelection(i,sels){
+  const text=sels.map(s=>s.L.chars.slice(s.a,s.b).map(c=>c.c).join('')).join('\n');
+  const v=await askEdit(text,sels[0].L.f,sels.length>1);
+  if(v==null||(v.text===text&&v.f===sels[0].L.f))return;
+  applyEdit(i,sels,v.text,v.f);
+}
+let ete=null,hintT=0;
+const pageAt=e=>{const el=document.elementFromPoint(e.clientX,e.clientY);return el&&el.closest&&el.closest('.pg')};
+V.addEventListener('pointerdown',e=>{
+  if(tool!='edittext'||e.button)return;
+  const el=e.target.closest('.pg');if(!el)return;
+  const i=+el.dataset.i,p=pages[i],r=el.getBoundingClientRect();
+  const P=ev=>inv(p,(ev.clientX-r.left)/scale,(ev.clientY-r.top)/scale);
+  const box=document.createElement('div');box.className='selbox';box.hidden=true;el.append(box);
+  el.querySelectorAll('.linehint').forEach(n=>n.remove());
+  ete={i,el,r,P,p,cx:e.clientX,cy:e.clientY,box,moved:false};
+});
+addEventListener('pointermove',e=>{
+  if(ete){
+    const s=ete;if(Math.hypot(e.clientX-s.cx,e.clientY-s.cy)>5)s.moved=true;
+    if(s.moved){s.box.hidden=false;Object.assign(s.box.style,{left:Math.min(s.cx,e.clientX)-s.r.left+'px',top:Math.min(s.cy,e.clientY)-s.r.top+'px',width:Math.abs(e.clientX-s.cx)+'px',height:Math.abs(e.clientY-s.cy)+'px'})}
+    return;
+  }
+  if(tool!='edittext'||e.pointerType=='touch')return;
+  const el=pageAt(e);document.querySelectorAll('.linehint').forEach(n=>n.remove());
+  if(!el)return;
+  clearTimeout(hintT);
+  hintT=setTimeout(async()=>{
+    const i=+el.dataset.i,p=pages[i];if(!p)return;
+    const lines=await getLines(p),r=el.getBoundingClientRect(),[x,y]=inv(p,(e.clientX-r.left)/scale,(e.clientY-r.top)/scale),L=lineAt(lines,x,y);
+    el.querySelectorAll('.linehint').forEach(n=>n.remove());
+    if(!L||tool!='edittext')return;
+    const [t,b]=lineBox(L),[u1,v1]=fwd(p,L.x0,t),[u2,v2]=fwd(p,L.x1,b),h=document.createElement('div');h.className='linehint';
+    Object.assign(h.style,{left:Math.min(u1,u2)*scale+'px',top:Math.min(v1,v2)*scale+'px',width:Math.abs(u2-u1)*scale+'px',height:Math.abs(v2-v1)*scale+'px'});el.append(h);
+  },60);
+});
+addEventListener('pointerup',async e=>{
+  if(!ete)return;
+  const s=ete;ete=null;s.box.remove();
+  const {i,p}=s;
+  const lines=await getLines(p);
+  if(!lines.length){toast(ocr[p.d+':'+p.n]?'No text found on this page.':'No selectable text on this page. Use Make searchable first, then try again.');return}
+  const [x,y]=s.P(e);
+  if(!s.moved){
+    const L=lineAt(lines,x,y);
+    if(!L){toast('Click on a line of text.');return}
+    editSelection(i,[{L,a:0,b:L.chars.length}]);
+    return;
+  }
+  const [xa,ya]=s.P({clientX:s.cx,clientY:s.cy}),x0=Math.min(x,xa),x1=Math.max(x,xa),y0=Math.min(y,ya),y1=Math.max(y,ya),sels=[];
+  for(const L of lines){
+    const [t,b]=lineBox(L),ya0=y0-2,ya1=y1+2,ov=Math.min(b,ya1)-Math.max(t,ya0);if(ov<.4*Math.min(b-t,ya1-ya0))continue;
+    let a=-1,z=-1;L.chars.forEach((c,q)=>{const m=(c.x0+c.x1)/2;if(m>=x0&&m<=x1){if(a<0)a=q;z=q}});
+    if(a>=0)sels.push({L,a,b:z+1});
+  }
+  if(!sels.length){toast('Drag across the words you want to change.');return}
+  editSelection(i,sels);
+});
+addEventListener('pointercancel',()=>{if(ete){ete.box.remove();ete=null}});
+
+// Make searchable (OCR)
+let ocrRun=null;
+const pageHasText=async p=>{const tx=await (await docs[p.d].pdf.getPage(p.n)).getTextContent();return tx.items.reduce((n,it)=>n+(it.str||'').trim().length,0)>=15};
+const loadScript=src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('Could not download the reading engine. Check your internet connection and try again.'));document.head.append(s)});
+function ocrWords(data,k){
+  let ws=data.words;
+  if(!ws||!ws.length){ws=[];(data.blocks||[]).forEach(b=>(b.paragraphs||[]).forEach(pa=>(pa.lines||[]).forEach(l=>(l.words||[]).forEach(w=>ws.push(w)))))}
+  const r=n=>Math.round(n*10)/10;
+  return ws.filter(w=>w.text&&w.text.trim()&&w.bbox&&(w.confidence==null||w.confidence>=30)).map(w=>[w.text.trim(),r(w.bbox.x0/k),r(w.bbox.y0/k),r((w.bbox.x1-w.bbox.x0)/k),r((w.bbox.y1-w.bbox.y0)/k)]);
+}
+async function runOcr(){
+  const st=$('#ocs'),bar=$('#ocb'),go=$('#ocg'),all=$('#ocall').checked;
+  go.disabled=true;$('#ocall').disabled=true;ocrRun={stop:false};let worker=null;
+  const say=m=>st.textContent=m;
+  try{
+    say('Looking for pages without text…');
+    const seen=new Set(),targets=[];
+    for(const p of pages){const key=p.d+':'+p.n;if(seen.has(key))continue;seen.add(key);if(all||!(await pageHasText(p)))targets.push(p)}
+    if(!targets.length){say('Every page already has searchable text.');return}
+    say('Getting the reading engine…');
+    if(!window.Tesseract)await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+    let cur='';worker=await Tesseract.createWorker('eng',1,{logger:m=>{if(m.status&&m.status!=='recognizing text')say((m.status[0].toUpperCase()+m.status.slice(1))+(m.progress?` ${Math.round(m.progress*100)}%`:'')+'…')}});
+    bar.hidden=false;bar.max=targets.length;bar.value=0;let n=0,words=0;
+    for(const p of targets){
+      if(ocrRun.stop)break;
+      say(`Reading page ${n+1} of ${targets.length}…`);
+      const pg=await docs[p.d].pdf.getPage(p.n),v1=pg.getViewport({scale:1}),k=Math.max(1.5,Math.min(4,2400/v1.width)),vp=pg.getViewport({scale:k});
+      const c=document.createElement('canvas');c.width=Math.ceil(vp.width);c.height=Math.ceil(vp.height);
+      await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+      const res=await worker.recognize(c),w=ocrWords(res.data,k),key=p.d+':'+p.n;
+      if(w.length)ocr[key]=w;else delete ocr[key];
+      delete tcache[key];delete lcache[key];words+=w.length;n++;bar.value=n;
+    }
+    touch();if(fOpen)runFind(false);
+    say(ocrRun.stop?`Stopped. ${n} page${n==1?'':'s'} done.`:`Done: ${n} page${n==1?'':'s'}, ${words} words. Find and the saved PDF can use them now.`);
+  }catch(err){say(err.message||'Something went wrong.')}
+  finally{try{if(worker)await worker.terminate()}catch(e){}ocrRun=null;go.disabled=false;$('#ocall').disabled=false}
+}
+$('#ocr').onclick=()=>{if(!pages.length)return;$('#ocb').hidden=true;$('#ocs').textContent='';$('#oc').showModal()};
+$('#ocg').onclick=runOcr;
+$('#ocx').onclick=()=>{if(ocrRun)ocrRun.stop=true;$('#oc').close()};
+$('#oc').addEventListener('cancel',()=>{if(ocrRun)ocrRun.stop=true});
+
+// ---- White text on dark highlights ----
+// Highlights stay multiply-blended, so dark text keeps showing through. For a colour set to "white text",
+// the page's dark text inside its highlights is redrawn white. Applies to every highlight of that colour.
+let hlInk=lget('hoedobe.hlink');if(!hlInk||typeof hlInk!='object')hlInk={};
+const hexRgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+function inkMode(c){c=(c||'').toLowerCase();if(hlInk[c])return hlInk[c];return HEX.test(c)&&hexHsl(c)[2]<=40?'w':'k'}
+function isBlackInk(h){if(!HEX.test(h||''))return false;const [r,g,b]=hexRgb(h);return Math.max(r,g,b)-Math.min(r,g,b)<=40&&(r*.299+g*.587+b*.114)<=110}
+function overlapFrac(t,rs){
+  const A=t[2]*t[3];if(!(A>0))return 0;let sum=0;
+  for(const r of rs){const w=Math.min(t[0]+t[2],r[0]+r[2])-Math.max(t[0],r[0]),h=Math.min(t[1]+t[3],r[1]+r[3])-Math.max(t[1],r[1]);if(w>0&&h>0)sum+=w*h}
+  return Math.min(1,sum/A);
+}
+// Coverage of dark, neutral ink per pixel (0-255). Coloured text is left alone.
+function darkCover(d,n,out){
+  for(let q=0,k=0;k<n;q+=4,k++){
+    const r=d[q],g=d[q+1],b=d[q+2];
+    if(d[q+3]<128){out[k]=0;continue}
+    const lum=r*.299+g*.587+b*.114,ch=Math.max(r,g,b)-Math.min(r,g,b),f=ch<=18?1:ch>=45?0:(45-ch)/27,c=Math.round((255-lum)*f);
+    out[k]=c<40?0:c;
+  }
+}
+function inkMask(el){
+  if(el._m)return el._m;
+  const c=el.querySelector('canvas');if(!el._ready||!c||!c.width)return null;
+  const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data,cov=new Uint8Array(c.width*c.height);
+  darkCover(d,cov.length,cov);
+  return el._m={w:c.width,h:c.height,cov};
+}
+function paintInk(i){
+  const el=V.children[i],cv=el&&el.querySelector('canvas.ink'),p=pages[i];if(!cv||!p)return;
+  const wh=p.ann.filter(a=>a.t=='rect'&&a.hl&&inkMode(a.c)=='w');
+  if(!wh.length){if(cv.width>1){cv.width=1;cv.height=1}return}
+  const m=inkMask(el);if(!m)return;
+  const [W]=dims(p),kk=m.w/W;
+  if(cv.width!==m.w||cv.height!==m.h){cv.width=m.w;cv.height=m.h;el._id=null}
+  const g=cv.getContext('2d');
+  if(!el._id)el._id=g.createImageData(m.w,m.h);else el._id.data.fill(0);
+  const D=el._id.data,pxBox=a=>{const [x1,y1]=fwd(p,a.x,a.y),[x2,y2]=fwd(p,a.x+a.w,a.y+a.h);
+    return[Math.max(0,Math.floor(Math.min(x1,x2)*kk)),Math.max(0,Math.floor(Math.min(y1,y2)*kk)),Math.min(m.w,Math.ceil(Math.max(x1,x2)*kk)),Math.min(m.h,Math.ceil(Math.max(y1,y2)*kk))]};
+  for(const a of wh){
+    const [X0,Y0,X1,Y1]=pxBox(a),o=oa(a),rgb=hexRgb(a.c).map(v=>255*(1-o)+v*o);
+    for(let y=Y0;y<Y1;y++)for(let x=X0;x<X1;x++){
+      const cv_=m.cov[y*m.w+x];if(!cv_)continue;
+      const t=cv_/255,q=(y*m.w+x)*4;
+      D[q]=rgb[0]*(1-t)+255*t;D[q+1]=rgb[1]*(1-t)+255*t;D[q+2]=rgb[2]*(1-t)+255*t;D[q+3]=255;
+    }
+  }
+  g.putImageData(el._id,0,0);
+  // text hidden under a whiteout stays hidden
+  p.ann.forEach(a=>{if(a.t=='rect'&&!a.hl){const [X0,Y0,X1,Y1]=pxBox(a);g.clearRect(X0,Y0,X1-X0,Y1-Y0)}});
+}
+// Same thing for the saved PDF: a small picture (transparent except where the text is) laid over each highlight.
+const patchCache=new Map();
+async function inkPatch(p,pg,a,P){
+  const covers=p.ann.filter(q=>q.t=='rect'&&!q.hl),key=JSON.stringify([p.d,p.n,p.rot,a.x,a.y,a.w,a.h,a.c,oa(a),covers.map(q=>[q.x,q.y,q.w,q.h])]);
+  if(patchCache.has(key))return patchCache.get(key);
+  const box=q=>{const [x1,y1]=P(q.x,q.y),[x2,y2]=P(q.x+q.w,q.y+q.h);return[Math.min(x1,x2),Math.min(y1,y2),Math.max(x1,x2),Math.max(y1,y2)]};
+  const [ux0,uy0,ux1,uy1]=box(a);
+  const v0=pg.getViewport({scale:1,rotation:0}),S=Math.max(1,Math.min(4,3200/Math.max(v0.width,v0.height))),vp=pg.getViewport({scale:S,rotation:0});
+  const pc=document.createElement('canvas');pc.width=Math.ceil(vp.width);pc.height=Math.ceil(vp.height);
+  await pg.render({canvasContext:pc.getContext('2d'),viewport:vp}).promise;
+  const px=(ux,uy)=>vp.convertToViewportPoint(ux,uy),[ax,ay]=px(ux0,uy1),[bx,by]=px(ux1,uy0);
+  const X0=Math.max(0,Math.floor(Math.min(ax,bx))),Y0=Math.max(0,Math.floor(Math.min(ay,by))),X1=Math.min(pc.width,Math.ceil(Math.max(ax,bx))),Y1=Math.min(pc.height,Math.ceil(Math.max(ay,by))),w=X1-X0,h=Y1-Y0;
+  if(w<2||h<2){patchCache.set(key,null);return null}
+  const d=pc.getContext('2d').getImageData(X0,Y0,w,h).data,cov=new Uint8Array(w*h);darkCover(d,w*h,cov);
+  for(const q of covers){const [cx0,cy0,cx1,cy1]=box(q),[bx0,by0]=px(cx0,cy1),[bx1,by1]=px(cx1,cy0);
+    for(let y=Math.max(0,Math.floor(Math.min(by0,by1))-Y0);y<Math.min(h,Math.ceil(Math.max(by0,by1))-Y0);y++)for(let x=Math.max(0,Math.floor(Math.min(bx0,bx1))-X0);x<Math.min(w,Math.ceil(Math.max(bx0,bx1))-X0);x++)cov[y*w+x]=0}
+  const o=oa(a),rgb=hexRgb(a.c).map(v=>255*(1-o)+v*o),oc=document.createElement('canvas');oc.width=w;oc.height=h;
+  const og=oc.getContext('2d'),im=og.createImageData(w,h),D=im.data;let any=false;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const k=y*w+x;let c=cov[k],near=c>0;
+    if(!near)for(let dy=-2;dy<=2&&!near;dy++)for(let dx=-2;dx<=2;dx++){const xx=x+dx,yy=y+dy;if(xx>=0&&yy>=0&&xx<w&&yy<h&&cov[yy*w+xx]>6){near=true;break}}   // small halo hides the black edge of the original letters
+    if(!near)continue;any=true;
+    const t=c/255,q=k*4;D[q]=rgb[0]*(1-t)+255*t;D[q+1]=rgb[1]*(1-t)+255*t;D[q+2]=rgb[2]*(1-t)+255*t;D[q+3]=255;
+  }
+  let res=null;
+  if(any){og.putImageData(im,0,0);const blob=await new Promise(r=>oc.toBlob(r,'image/png'));res={png:new Uint8Array(await blob.arrayBuffer()),x:ux0,y:uy0,w:ux1-ux0,h:uy1-uy0}}
+  patchCache.set(key,res);if(patchCache.size>60)patchCache.delete(patchCache.keys().next().value);
+  return res;
+}
+function toggleHlInk(c){
+  c=c.toLowerCase();const now=inkMode(c)=='w'?'k':'w';hlInk[c]=now;lset('hoedobe.hlink',hlInk);
+  pages.forEach((_,i)=>overlay(i));hlBtn();touch();
+  toast(`Text on every ${c} highlight is now ${now=='w'?'white':'black'}.`);
+}
+function hlBtn(){
+  const b=$('#hlt');if(!b)return;
+  const a=tool=='select'?selAnn():null,on=!!(a&&a.t=='rect'&&a.hl);
+  b.hidden=!on;if(on)b.textContent='Text: '+(inkMode(a.c)=='w'?'white':'black');
+}
+$('#hlt').onclick=()=>{const a=selAnn();if(a&&a.t=='rect'&&a.hl)toggleHlInk(a.c)};
+// Double-click (or double-tap) a highlight. The page redraws on the first press, so browsers never send a
+// dblclick event; this watches for two quick presses in the same spot and finds the highlight by position.
+let lastDown={t:0,x:0,y:0};
+V.addEventListener('pointerdown',e=>{
+  if(tool!='select'||e.button||e.target.closest('.t')||e.target.closest('.rs'))return;
+  const now=performance.now(),dbl=now-lastDown.t<450&&Math.hypot(e.clientX-lastDown.x,e.clientY-lastDown.y)<9;
+  lastDown={t:dbl?0:now,x:e.clientX,y:e.clientY};
+  if(!dbl)return;
+  const el=e.target.closest('.pg'),p=el&&pages[+el.dataset.i];if(!p)return;
+  const r=el.getBoundingClientRect(),[x,y]=inv(p,(e.clientX-r.left)/scale,(e.clientY-r.top)/scale);
+  for(let k=p.ann.length-1;k>=0;k--){const a=p.ann[k];
+    if(a.t=='rect'&&a.hl&&x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h){toggleHlInk(a.c);return}}
+},true);
 
 // ---- Phone: share sheet, reminders, install, offline ----
 var nagT=Date.now();
