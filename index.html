@@ -125,6 +125,14 @@ body.phone #ph{position:fixed;inset:0;display:flex;flex-direction:column;align-i
 #asb small{font-size:10px;color:var(--mute)}
 #asb.warn small{color:#e8c27a}
 #hspace{flex:1}
+#flat,#scex2,#scex3{background:#2d4f3c;border-color:#3d6a50;color:#fff}
+#flat:hover:not(:disabled),#scex2:hover:not(:disabled),#scex3:hover:not(:disabled){background:#38624b}
+#scd #scap,#scd #scap.pri,#scd #sccl,#scd #scex1,#scd #scmg,#scd #scdd{background:#fff;color:#111;border-color:#c9cfdd}
+#scd #scap:hover,#scd #sccl:hover,#scd #scex1:hover,#scd #scmg:hover,#scd #scdd:hover{background:#eaf0ff}
+#scap .hlx{background:#5fd68a;padding:1px 5px;border-radius:2px}
+#scd .row>button,#scd .stk button{font-size:13px;padding-left:10px;padding-right:10px}
+#scd .stk{display:inline-flex;flex-direction:column;gap:6px}
+#scd .stk button{width:100%}
 #scd,#scd button,#scd input,#scd select,#scd summary{font-family:'Courier New',Courier,'Liberation Mono',monospace}
 #ver{color:var(--mute);font-size:12px;font-weight:600;margin-left:-4px;align-self:center}
 .grp{display:inline-flex;gap:8px;align-items:center;flex:none}
@@ -359,14 +367,16 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
 </dialog>
 <dialog id="scd"><h2>Script mode</h2>
   <p id="scs" class="mut" role="status"></p>
-  <div class="scopts"><label><input type="checkbox" id="sco1"> Highlight dialogue</label><label><input type="checkbox" id="sco2"> Highlight names in the action</label><label><input type="checkbox" id="sco3"> Squares at scene headings</label><label title="Wherever one of these highlights covers black script text, that text is redrawn white. Nothing else changes, and the colors stay at full strength."><input type="checkbox" id="sco4"> Turn script text white under highlights</label></div>
+  <div class="scopts"><label><input type="checkbox" id="sco1"> Highlight dialogue</label><label><input type="checkbox" id="sco2"> Highlight names in the action</label><label><input type="checkbox" id="sco3"> Squares at scene headings</label><label title="Wherever one of these highlights covers black script text, that text is redrawn white. Nothing else changes, and the colors stay at full strength."><input type="checkbox" id="sco4"> Turn script text white under highlights</label><label title="Draws a black box around sound words in the action lines (bang, crash, siren, glass breaking and so on)"><input type="checkbox" id="sco5"> Box sound effect words in the script</label><label title="Adds a column after D/N: a boxed count of the sound words in each scene"><input type="checkbox" id="sco6"> Add sound effects column to the cast sheet</label><label title="Adds a voice-over column to the cast sheet, and on the day out of days marks each VO character with a VO tag and fills the days their VO scenes shoot black"><input type="checkbox" id="sco7"> Add VO column (and mark VO on the day out of days)</label></div>
   <p class="mut" style="font-size:12px;margin:4px 0">Drag a row by the dots (or use the arrows) to set the order. The same order is used for the squares and the cast sheet columns.</p>
   <div id="sct"></div>
   <div class="row"><input id="scadd" placeholder="Add a name the app missed" aria-label="Add a character name" autocomplete="off"><button id="scaddb">Add character</button></div>
   <details id="scam"><summary>Needs your decision (<span id="scan">0</span>)</summary><p class="mut" style="font-size:12px">A first name in the action that fits more than one character, and nobody in the scene settles it.</p><div id="scal"></div></details>
   <details id="scgd"><summary>Cast sheet preview (hover a scene for its details)</summary><div id="scgrid"></div></details>
   <label class="feel" style="margin-top:8px"><input type="checkbox" id="scidx" style="flex:none"> Add scene index pages (full headings and who is in each) to exports</label>
-  <div class="row"><button id="scap" class="pri">Apply to script</button><button id="sccl">Remove marks</button><button id="scex1" style="margin-left:auto" title="The script with highlights and squares, plus the cast sheet pages at the end">Markup script + add cast sheet</button><button id="scex2" title="Only the cast sheet pages">Cast sheet only (PDF)</button><button id="scex3" title="A spreadsheet: one row per scene with the full scene heading, one column per character">Cast sheet (Excel)</button><button id="scx">Close</button></div>
+  <p id="scsd" class="mut" style="font-size:12px;margin:6px 0 2px"></p>
+  <div class="row"><button id="scmg" title="Adds a shooting-date column to the cast sheet, taken from the one-liner pages in this PDF (use Add pages to bring them in)">Merge cast sheet with one-liner</button><button id="scdd" title="Numbers the characters like the day out of days pages in this PDF and puts them in the same order, on the script, cast sheet and Excel">Order characters by day out of days</button></div>
+  <div class="row"><button id="scap" class="pri">Apply to script</button><button id="sccl">Remove marks</button><button id="scex1" style="margin-left:auto" title="The script with highlights and squares, plus the cast sheet pages at the end">Markup script + add cast sheet</button><span class="stk"><button id="scex2" title="Only the cast sheet pages, as a PDF">Cast sheet only (PDF)</button><button id="scex3" title="Only the cast sheet, as a spreadsheet: one row per scene with the full scene heading, one column per character">Cast sheet only (Excel)</button></span><button id="scx">Close</button></div>
 </dialog>
 <div id="toast" hidden role="status"></div>
 <dialog id="te"><h2>Edit text</h2>
@@ -395,7 +405,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
 </div>
 <script>
 const $=s=>document.querySelector(s);
-const APP_V=16;   // bump with every export; shown next to the title and used in the delivered folder name
+const APP_V=20;   // bump with every export; shown next to the title and used in the delivered folder name
 $('#ver').textContent='V'+String(APP_V).padStart(2,'0');
 const V=$('#view'),T=$('#thumbs');
 let docs=[],pages=[],tool='select',scale=1.3,sel=null,hist=[],fname='edited.pdf',drag=null,from=null;
@@ -516,7 +526,7 @@ function overlay(i){
       if(isSel(k))s+=`<rect x="${u}" y="${v}" width="${a.w}" height="${a.h}" fill="none" stroke="#5b8cff" stroke-dasharray="4" pointer-events="none"/><circle class="rs" data-k="${k}" cx="${u+a.w}" cy="${v+a.h}" r="7" fill="#5b8cff"/>`;
     }else if(a.t=='sq'){
       const [x,y,w,h]=box(a.x,a.y,a.w,a.h);
-      if(a.sk){const f=w/11;s+=`<g transform="translate(${x} ${y}) scale(${f})" fill="#000" stroke="none"><path d="M0 3.5H2.4L5.6 1V9L2.4 6.5H0Z"/><path d="M7.1 3.2Q8.5 5 7.1 6.8M8.7 1.7Q11.3 5 8.7 8.3" fill="none" stroke="#000" stroke-width="1.1" stroke-linecap="round"/></g>`}
+      if(a.sk){const f=w/11,d=SKI[a.sk]||SKI[1];s+=`<g transform="translate(${x} ${y}) scale(${f})" fill="#000" stroke="none">${d.f.map(q=>`<path d="${q}"/>`).join('')}<path d="${d.s.join('')}" fill="none" stroke="#000" stroke-width="1.1" stroke-linecap="round"/></g>`}
       else s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${a.c}"/>`;
     }else if(a.t=='path'){
       s+=`<polyline data-k="${k}" class="a${isSel(k)}" fill="none" stroke="${a.c}" stroke-opacity="${oa(a)}" stroke-width="${a.s}" stroke-linecap="round" stroke-linejoin="round" points="${a.p.map(q=>fwd(p,q[0],q[1]).join(',')).join(' ')}"/>`;
@@ -1596,10 +1606,7 @@ async function buildPdf(opts={}){
           cp.drawRectangle({x:Math.min(x1,x2),y:Math.min(y1,y2),width:Math.abs(x2-x1),height:Math.abs(y2-y1),color:col(a.c),borderWidth:0});
         }else if(a.t=='sq'){
           const [x1,y1]=P(a.x,a.y),[x2,y2]=P(a.x+a.w,a.y+a.h),o={x:Math.min(x1,x2),y:Math.min(y1,y2),width:Math.abs(x2-x1),height:Math.abs(y2-y1),color:col(a.c),borderWidth:0};
-          if(a.sk){const f=a.w/11,K=rgb(0,0,0),X=Math.min(x1,x2),Y=Math.max(y1,y2);
-            cp.drawSvgPath('M0 3.5 H2.4 L5.6 1 V9 L2.4 6.5 H0 Z',{x:X,y:Y,scale:f,color:K,borderWidth:0});
-            cp.drawSvgPath('M7.1 3.2 Q8.5 5 7.1 6.8',{x:X,y:Y,scale:f,borderColor:K,borderWidth:1.1,borderLineCap:1});
-            cp.drawSvgPath('M8.7 1.7 Q11.3 5 8.7 8.3',{x:X,y:Y,scale:f,borderColor:K,borderWidth:1.1,borderLineCap:1})}
+          if(a.sk){scIconPdf(cp,a.sk,Math.min(x1,x2),Math.max(y1,y2),a.w/11,rgb(0,0,0))}
           else cp.drawRectangle(o);
         }else if(a.t=='path'){
           cp.drawSvgPath('M'+a.p.map(q=>pt(q[0],q[1])).join(' L'),{x:0,y:0,scale:1,borderColor:col(a.c),borderWidth:a.s,borderOpacity:oa(a),borderLineCap:1});
@@ -2014,7 +2021,7 @@ V.addEventListener('pointerdown',e=>{
 },true);
 
 // ---- Script mode: recognise a screenplay, find characters and scenes, colour them, build a cast sheet ----
-var SC={is:false,sig:'',tok:0,chars:[],rm:[],seeds:[],dec:{},nc:0,opt:{dlg:true,nm:true,sq:true,o:.8,idx:false,wt:false},scenes:[],amb:[],told:'',dirty:false,busy:''};
+var SC={is:false,sig:'',tok:0,chars:[],rm:[],seeds:[],dec:{},nc:0,opt:{dlg:true,nm:true,sq:true,o:.8,idx:false,wt:false,merge:false,fx:false,fxc:false,voc:false},scenes:[],amb:[],told:'',dirty:false,busy:''};
 const SC_HEAD=/^(INT|EXT|EST|I\s*\/\s*E)(?=[.\s\/-])/i;
 const SC_NUM=/^\d{1,3}[A-Z]{0,2}\*?$/,SC_STAR=/^\*+$/;
 const scTxt=L=>L.chars.map(c=>c.c).join('');
@@ -2101,7 +2108,7 @@ function scParse(RP,cols){
       if(r.main.length!=1){blk=null;if(!r.main.length&&cur&&r.nl&&!cur.num)cur.num=r.nl;continue}
       const s=r.main[0],t=scTxt(s).trim(),x=s.x0,hd=scHeadOf(s);
       if(hd&&Math.abs(hd.x-A)<=10){
-        cur={i:scenes.length,num:hd.num||r.nl||r.nr||'',head:hd.text,pi:g.pi,y:r.y,sz:r.sz,L:s,hx1:s.x1,rlim:r.rlim,om:false,blocks:[],acts:[],sp:new Set(),pr:new Set(),mens:[]};
+        cur={i:scenes.length,num:hd.num||r.nl||r.nr||'',head:hd.text,pi:g.pi,y:r.y,sz:r.sz,L:s,hx1:s.x1,rlim:r.rlim,om:false,blocks:[],acts:[],sp:new Set(),vo:new Set(),pr:new Set(),mens:[],fx:[]};
         scenes.push(cur);blk=null;
         // a long heading may wrap onto a second row
         for(let k=ri+1;k<g.rows.length;k++){const q=g.rows[k],qs=q.main[0];if(q.main.length!=1||q.y-g.rows[k-1].y>1.35*q.sz||Math.abs(qs.x0-A)>8)break;const qt=scTxt(qs).trim();if(!scNoLow(qt)||/:$/.test(qt)||scHeadOf(qs))break;cur.head+=' '+qt;g.rows[k]={...q,main:[],skip:true};ri=k}
@@ -2112,9 +2119,10 @@ function scParse(RP,cols){
       if(/^\(?\s*(MORE|CONT'?D?\.?|CONTINUED)\s*\)?$/i.test(t))continue;
       const bare=t.replace(/\([^)]*\)/g,'').replace(/\*+$/,'').trim();
       if(Math.abs(x-C)<=10&&bare&&scNoLow(bare)&&/[A-Z]/.test(bare)&&!/:$/.test(t)&&!/^\(/.test(t)&&bare.length<=45){
-        let key=bare.toUpperCase().replace(/\s+/g,' ');{const w=key.split(' ');if(w.length%2==0&&w.slice(0,w.length/2).join(' ')==w.slice(w.length/2).join(' '))key=w.slice(0,w.length/2).join(' ')}
+        const isVO=/(^|[\s(])(V\.?\s?O\.?|VOICE[\s-]?OVER)(?=$|[\s).,])/i.test(t);
+        let key=bare.toUpperCase().replace(/\s+/g,' ');if(isVO){const k2=key.replace(/\s*\(?\b(V\.?\s?O\.?|VOICE[\s-]?OVER)\)?\s*$/,'').trim();if(k2)key=k2}{const w=key.split(' ');if(w.length%2==0&&w.slice(0,w.length/2).join(' ')==w.slice(w.length/2).join(' '))key=w.slice(0,w.length/2).join(' ')}
         if(!chars.has(key))chars.set(key,{id:key,cue:key,hasLines:true,first:cur.i});
-        blk={key,rows:[{pi:g.pi,L:s}]};cur.blocks.push(blk);cur.sp.add(key);continue;
+        blk={key,rows:[{pi:g.pi,L:s}],vo:isVO};cur.blocks.push(blk);cur.sp.add(key);if(isVO)cur.vo.add(key);continue;
       }
       if(blk&&/^\(/.test(t)&&x>D-6&&x<C){blk.rows.push({pi:g.pi,L:s});continue}
       if(blk&&Math.abs(x-D)<=8){blk.rows.push({pi:g.pi,L:s});continue}
@@ -2122,7 +2130,22 @@ function scParse(RP,cols){
       if(Math.abs(x-A)<=8)cur.acts.push({pi:g.pi,L:s});
     }
   }
+  for(const sc of scenes)sc.fx=scFxFind(sc);
   return{scenes,chars};
+}
+// Sound words in the action lines (not in dialogue): a built-in list of onomatopoeia and sound events.
+const SC_FX=(()=>{
+  const base='bang boom crash crack thud thump slam smash shatter clang clank clatter clink clunk crunch rattle rumble roar screech squeal squeak creak hiss buzz hum whir whirr whine drone beep honk horn siren alarm ding chime buzzer click clack snap pop ping tick knock thunder splash drip gurgle sizzle crackle whoosh whistle wail howl bark growl snarl yelp squawk chirp caw rustle scrape scratch scuff skid gunshot gunfire explosion explode blast detonation backfire sputter rev revving sfx noise echo ringing ringtone feedback scream shriek yowl screeching thwack whack slap splat splatter plink twang zap crumple cluck moo oink hoot honking tooting blare blaring thrum purr jingle jangle fizz'.split(' ');
+  const v=new Set();
+  for(const w of base){v.add(w);v.add(w+'s');if(/e$/.test(w)){v.add(w+'d');v.add(w.slice(0,-1)+'ing')}else{v.add(w+'es');v.add(w+'ed');v.add(w+'ing')}
+    if(/[^aeiou][aeiou][bdgklmnprstz]$/.test(w)&&w.length<=5){v.add(w+w.slice(-1)+'ed');v.add(w+w.slice(-1)+'ing')}}
+  const ph=['glass\\s+break(?:s|ing)?','break(?:s|ing)\\s+glass','shatter(?:s|ed|ing)?\\s+glass','peel(?:s|ed|ing)?\\s+out','burn(?:s|ed|ing)?\\s+rubber','sounds?\\s+of','rings?\\s+out','engine\\s+(?:revs?|roars?|sputters?|stalls?|dies)','tires?\\s+(?:squeal|screech|skid)\\w*','door\\s+(?:slams?|creaks?)'];
+  return new RegExp('(?<![A-Za-z\'’])(?:'+ph.join('|')+'|'+[...v].join('|')+')(?![A-Za-z\'’])(?!\\s+(?:mic|microphone|operator|op\\b|pole))','gi');
+})();
+function scFxFind(sc){
+  const out=[];
+  for(const a of sc.acts||[]){const T=scTxt(a.L);SC_FX.lastIndex=0;let m;while((m=SC_FX.exec(T)))out.push({pi:a.pi,L:a.L,i0:m.index,i1:m.index+m[0].length,w:m[0].toLowerCase().replace(/\s+/g,' ')})}
+  return out;
 }
 function scAliasMap(){
   const al=new Map(),add=(txt,id)=>{const k=String(txt).toUpperCase().replace(/[^A-Z ]+/g,' ').replace(/\s+/g,' ').trim();if(k.length<2)return;(al.get(k)||al.set(k,new Set()).get(k)).add(id)};
@@ -2185,15 +2208,17 @@ async function scScan(force){
   if(!pages.length){SC.is=false;SC.scenes=[];scUI();return false}
   SC.busy='Looking at the pages…';scUI();
   // 1) cheap check on a sample of pages: does this look like a screenplay at all?
-  const samp=[];for(const i of scSample(pages.length)){samp.push(await scPageRows(i));if(tok!=SC.tok)return false}
+  const kinds=await scKinds(),ids=[...pages.keys()].filter(i=>!kinds[i]);   // one-liner and day-out-of-days pages are not script
+  if(!ids.length){SC.is=false;SC.scenes=[];SC.busy='';scUI();return false}
+  const samp=[];for(const k of scSample(ids.length)){samp.push(await scPageRows(ids[k]));if(tok!=SC.tok)return false}
   scPrune(samp);
   const sc0=scCols(samp);
   if(!sc0.ok){SC.is=false;SC.scenes=[];SC.amb=[];SC.busy='';scUI();return false}
   // 2) the whole script
   const RP=[];
-  for(let i=0;i<pages.length;i++){
+  for(let q=0;q<ids.length;q++){const i=ids[q];
     RP.push(await scPageRows(i));
-    if(i%6==5){SC.busy=`Reading the script… page ${i+1} of ${pages.length}`;scUI();await scYield()}
+    if(q%6==5){SC.busy=`Reading the script… page ${q+1} of ${ids.length}`;scUI();await scYield()}
     if(tok!=SC.tok)return false;
   }
   scPrune(RP);
@@ -2203,6 +2228,7 @@ async function scScan(force){
   const {scenes,chars}=scParse(RP,cols);
   scResolve(scenes,chars);
   SC.cc=chars;SC.is=true;SC.scenes=scenes;SC.cols=cols;SC.busy='';scUI();
+  try{await scSchedLoad();scUI()}catch(e){}
   return true;
 }
 // Characters, name matches, who is in which scene.
@@ -2323,7 +2349,7 @@ function scSquares(sc,order,add){
   const inline=ids.slice(0,Math.min(ids.length,c0)),rest=ids.slice(inline.length);
   const put=(list,cy)=>list.forEach((c,k)=>{const x=xr-(list.length-k)*(size+g)+g;
     add(sc.pi,{t:'sq',x,y:cy-size/2,w:size,h:size,c:c.color,sc:c.id});
-    if(sc.sp.has(c.id))add(sc.pi,{t:'sq',sk:1,x:x+(size-ik)/2,y:cy+size/2+.7,w:ik,h:ik*.91,c:'#000000',sc:c.id})});
+    if(sc.sp.has(c.id))add(sc.pi,{t:'sq',sk:sc.vo&&sc.vo.has(c.id)?2:1,x:x+(size-ik)/2,y:cy+size/2+.7,w:ik,h:ik*.91,c:'#000000',sc:c.id})});
   const rowH=list=>size+g+(list.some(c=>sc.sp.has(c.id))?ik*.91+.7:0);
   if(inline.length)put(inline,mid);
   if(rest.length){
@@ -2343,7 +2369,10 @@ async function scApply(){
     if(SC.opt.dlg)for(const bl of sc.blocks){const c=on.get(bl.key);if(c)for(const r of bl.rows)rect(r.pi,r.L,r.L.x0,r.L.x1,c)}
     if(SC.opt.nm)for(const m of sc.mens){const c=m.key&&on.get(m.key);if(c)rect(m.pi,m.L,m.L.chars[m.i0].x0,m.L.chars[m.i1-1].x1,c)}
     if(SC.opt.sq)scSquares(sc,act,add);
+    if(SC.opt.fx&&!sc.om)for(const f of sc.fx){const [t,b]=lineBox(f.L),x0=f.L.chars[f.i0].x0-1,x1=f.L.chars[f.i1-1].x1+1;
+      add(f.pi,{t:'path',p:[[x0,t+1],[x1,t+1],[x1,b-1],[x0,b-1],[x0,t+1]],c:'#000000',s:.9,sc:'fx'})}
   }
+  try{await scSchedLoad();if(SD.dood||SD.one){if(SD.dood&&!SC.chars.some(c=>c.num))scMatchDood();scSchedMarks(add,on)}}catch(e){console.warn(e)}
   pages.forEach((_,i)=>overlay(i));
   SC.dirty=false;touch();scUI();
 }
@@ -2364,11 +2393,17 @@ function scInitials(chars){
   }
   return out;
 }
-function scSpeaker(pg,x,y,w,h,K){   // little loudspeaker with sound waves, centred in a cell
+// Icons drawn in an 11 x 10 box: 1 = speaking head, 2 = studio microphone
+const SKI={1:{f:['M0.8 9.7C0.6 8.2 0.9 7.4 0.7 6.2C0.2 4.8 0.2 3 1.4 1.9C2.6 0.7 5.1 0.6 6.2 1.9C6.8 2.6 6.9 3.6 7 4.2L7.8 5.1L7 5.5L7.2 6.2L6.7 6.4L6.9 7.2C6.9 7.9 6.2 8.2 5.4 8.3L5.2 9.7Z'],s:['M8.5 2.9Q9.3 4 8.5 5.1','M9.7 1.7Q11 4 9.7 6.3']},
+  2:{f:['M4 2Q4 0.4 5.5 0.4Q7 0.4 7 2V4.8Q7 6.4 5.5 6.4Q4 6.4 4 4.8Z'],s:['M2.6 4.2Q2.6 7.8 5.5 7.8Q8.4 7.8 8.4 4.2','M5.5 7.8V9.6','M3.8 9.6H7.2']}};
+function scIconPdf(pg,kind,ox,oy,sc,K){
+  const d=SKI[kind]||SKI[1];
+  for(const q of d.f)pg.drawSvgPath(q,{x:ox,y:oy,scale:sc,color:K,borderWidth:0});
+  for(const q of d.s)pg.drawSvgPath(q,{x:ox,y:oy,scale:sc,borderColor:K,borderWidth:1.1,borderLineCap:1});
+}
+function scSpeaker(pg,x,y,w,h,K,kind){   // speaking head (dialogue) or studio microphone (voice-over), centred in a cell
   const sc=Math.min(h-3.5,9.5)/10,iw=11*sc,ox=x+(w-iw)/2,oy=y+h-(h-10*sc)/2;
-  pg.drawSvgPath('M0 3.5 H2.4 L5.6 1 V9 L2.4 6.5 H0 Z',{x:ox,y:oy,scale:sc,color:K,borderWidth:0});
-  pg.drawSvgPath('M7.1 3.2 Q8.5 5 7.1 6.8',{x:ox,y:oy,scale:sc,borderColor:K,borderWidth:1.1,borderLineCap:1});
-  pg.drawSvgPath('M8.7 1.7 Q11.3 5 8.7 8.3',{x:ox,y:oy,scale:sc,borderColor:K,borderWidth:1.1,borderLineCap:1});
+  scIconPdf(pg,kind||1,ox,oy,sc,K);
 }
 async function scDrawCast(out,font){
   const {rgb,degrees,StandardFonts}=PDFLib,bold=await out.embedFont(StandardFonts.CourierBold);font=await out.embedFont(StandardFonts.Courier);   // screenplay type
@@ -2379,7 +2414,11 @@ async function scDrawCast(out,font){
   const K=rgb(0,0,0),GR=rgb(.8,.8,.8),MU=rgb(.4,.4,.4);
   const compact=chars.length>40,per=compact?44:40,ini=scInitials(chars);
   const chunks=[];for(let i=0;i<chars.length;i+=per)chunks.push(chars.slice(i,i+per));
-  const PW=792,PH=612,M=28,LW=84,RH=13.5,HH=compact?20:Math.min(330,Math.ceil(Math.max(...chars.map(c=>font.widthOfTextAtSize(S(c.name),8))))+14);
+  await scSchedLoad().catch(()=>{});
+  const sdm=SC.opt.merge&&SD.one?SD.one.map:null,lab=c=>c.num?c.num+'. '+c.name:c.name;
+  let xo=84;const xcol=w=>{const o=xo;xo+=w;return o};
+  const XN=xcol(26),XFX=SC.opt.fxc?xcol(22):-1,XVO=SC.opt.voc?xcol(22):-1,XSH=sdm?xcol(44):-1;
+  const PW=792,PH=612,M=28,LW=xo,RH=13.5,HH=compact?20:Math.min(330,Math.ceil(Math.max(...chars.map(c=>font.widthOfTextAtSize(S(lab(c)),8))))+14);
   const title=S('Cast sheet - '+fname.replace(/-edited\.pdf$|\.pdf$/i,''));
   const fit=(t,f,z,w)=>{t=S(t);if(f.widthOfTextAtSize(t,z)<=w)return t;while(t.length>1&&f.widthOfTextAtSize(t+'...',z)>w)t=t.slice(0,-1);return t+'...'};
   let pc=0;
@@ -2391,7 +2430,7 @@ async function scDrawCast(out,font){
       pg.drawText(title,{x:M,y:PH-M-10,size:12,font:bold,color:K});
       const sub=(chunks.length>1?`Characters ${ci*per+1}-${ci*per+ch.length} of ${chars.length}   `:'')+`Scenes ${scenes[r0].num} to ${scenes[Math.min(scenes.length,r0+rows)-1].num}`;
       pg.drawText(S(sub),{x:M,y:PH-M-23,size:7.5,font,color:MU});
-      pg.drawText('Scene',{x:M+2,y:top-HH+3,size:6.5,font:bold,color:K});pg.drawText('I/E',{x:M+34,y:top-HH+3,size:6.5,font:bold,color:K});pg.drawText('D/N',{x:M+60,y:top-HH+3,size:6.5,font:bold,color:K});
+      pg.drawText('Scene',{x:M+2,y:top-HH+3,size:6.5,font:bold,color:K});pg.drawText('I/E',{x:M+34,y:top-HH+3,size:6.5,font:bold,color:K});pg.drawText('D/N',{x:M+60,y:top-HH+3,size:6.5,font:bold,color:K});pg.drawText('Chars',{x:M+XN,y:top-HH+3,size:6.5,font:bold,color:K});if(XFX>=0)pg.drawText('FX',{x:M+XFX,y:top-HH+3,size:6.5,font:bold,color:K});if(XVO>=0)pg.drawText('VO',{x:M+XVO,y:top-HH+3,size:6.5,font:bold,color:K});if(sdm)pg.drawText('Shoots',{x:M+XSH,y:top-HH+3,size:6.5,font:bold,color:K});
       ch.forEach((c,j)=>{
         const x=M+LW+j*cw;
         if(compact){
@@ -2399,7 +2438,7 @@ async function scDrawCast(out,font){
           const t=ini.get(c.id),z=6.5,w=bold.widthOfTextAtSize(t,z);pg.drawText(t,{x:x+(cw-w)/2,y:top-HH+7,size:z,font:bold,color:K});
         }else{
           pg.drawRectangle({x:x+1,y:top-6,width:cw-2,height:5,color:hx(c.color)});
-          pg.drawText(S(c.name),{x:x+cw/2+3,y:top-HH+3,size:8,font,color:K,rotate:degrees(90)});
+          pg.drawText(S(lab(c)),{x:x+cw/2+3,y:top-HH+3,size:8,font,color:K,rotate:degrees(90)});
         }
       });
       const last=Math.min(scenes.length,r0+rows);
@@ -2407,7 +2446,10 @@ async function scDrawCast(out,font){
         const s=scenes[i],y=top-HH-(i-r0+1)*RH;
         pg.drawText(S(s.num),{x:M+2,y:y+4,size:7.5,font:bold,color:K});
         if(s.om)pg.drawText('OMITTED',{x:M+34,y:y+4,size:6.5,font,color:MU});
-        else{pg.drawText(S(s.ie),{x:M+34,y:y+4,size:6.5,font,color:K});pg.drawText(S(s.dn),{x:M+62,y:y+4,size:6.5,font,color:K})}
+        else{pg.drawText(S(s.ie),{x:M+34,y:y+4,size:6.5,font,color:K});pg.drawText(S(s.dn),{x:M+62,y:y+4,size:6.5,font,color:K});pg.drawText(String(chars.filter(c=>s.pr.has(c.id)).length||''),{x:M+XN+2,y:y+4,size:6.5,font,color:K});
+          if(XFX>=0&&s.fx&&s.fx.length){pg.drawRectangle({x:M+XFX+1,y:y+2.5,width:11,height:8.5,borderColor:K,borderWidth:.9});const n=String(s.fx.length);pg.drawText(n,{x:M+XFX+1+(11-font.widthOfTextAtSize(n,6))/2,y:y+4.6,size:6,font,color:K})}
+          if(XVO>=0&&s.vo&&chars.some(c=>s.vo.has(c.id)))scSpeaker(pg,M+XVO-4,y,22,RH,K,2);
+          if(sdm){const e=sdm.get(sdNum(s.num));if(e&&e.date)pg.drawText(S(e.date),{x:M+XSH,y:y+4,size:6.5,font,color:K})}}
         pg.drawLine({start:{x:M,y},end:{x:M+LW+ch.length*cw,y},thickness:.3,color:GR});
         if(s.om)continue;
         ch.forEach((c,j)=>{
@@ -2422,7 +2464,9 @@ async function scDrawCast(out,font){
       for(let j=0;j<=ch.length;j++)pg.drawLine({start:{x:M+LW+j*cw,y:top-HH},end:{x:M+LW+j*cw,y:gy},thickness:.3,color:GR});
       // legend
       pg.drawRectangle({x:M,y:M-6,width:9,height:9,color:rgb(.75,.75,.75)});pg.drawText('in the scene',{x:M+13,y:M-4,size:7,font,color:MU});
-      pg.drawRectangle({x:M+80,y:M-6,width:9,height:9,color:rgb(.75,.75,.75)});scSpeaker(pg,M+80,M-6,9,9,K);pg.drawText('has dialogue',{x:M+93,y:M-4,size:7,font,color:MU});
+      pg.drawRectangle({x:M+80,y:M-6,width:9,height:9,color:rgb(.75,.75,.75)});scSpeaker(pg,M+80,M-6,9,9,K,1);pg.drawText('has dialogue',{x:M+93,y:M-4,size:7,font,color:MU});
+      pg.drawRectangle({x:M+170,y:M-6,width:9,height:9,color:rgb(.75,.75,.75)});scSpeaker(pg,M+170,M-6,9,9,K,2);pg.drawText('voice-over',{x:M+183,y:M-4,size:7,font,color:MU});
+      if(XFX>=0){pg.drawRectangle({x:M+246,y:M-5,width:9,height:8,borderColor:K,borderWidth:.9});pg.drawText('sound effect words in the scene (count)',{x:M+259,y:M-4,size:7,font,color:MU})}
     }
   }
   // character key
@@ -2437,7 +2481,7 @@ async function scDrawCast(out,font){
       y-=KR;
       pg.drawRectangle({x:M,y:y,width:11,height:11,color:hx(c.color),borderColor:GR,borderWidth:.3});
       let x=M+16;if(compact){pg.drawText(ini.get(c.id),{x:x,y:y+2.5,size:8,font:bold,color:K});x+=50}
-      pg.drawText(fit(c.name,font,9,400-x),{x,y:y+2.5,size:9,font,color:K});
+      pg.drawText(fit(lab(c),font,9,400-x),{x,y:y+2.5,size:9,font,color:K});
       pg.drawText(String(c.n||0),{x:430,y:y+2.5,size:8.5,font,color:K});pg.drawText(String(c.sp||0),{x:490,y:y+2.5,size:8.5,font,color:K});
     }
   }
@@ -2483,7 +2527,7 @@ async function scCastPdf(){
 }
 // ---- Script mode: the panel ----
 const scE=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function scPack(){return{chars:SC.chars.map(c=>({id:c.id,cue:c.cue,name:c.name,color:c.color,on:c.on,hasLines:c.hasLines,full:c.full,seed:c.seed,al:c.al,ren:c.ren})),rm:SC.rm,seeds:SC.seeds,dec:SC.dec,nc:SC.nc,opt:SC.opt,dk:SC.dk||scDk(),told:SC.told}}
+function scPack(){return{chars:SC.chars.map(c=>({id:c.id,cue:c.cue,name:c.name,color:c.color,on:c.on,hasLines:c.hasLines,full:c.full,seed:c.seed,al:c.al,ren:c.ren,num:c.num,nums:c.nums})),rm:SC.rm,seeds:SC.seeds,dec:SC.dec,nc:SC.nc,opt:SC.opt,dk:SC.dk||scDk(),told:SC.told}}
 function scReset(){SC.chars=[];SC.rm=[];SC.seeds=[];SC.dec={};SC.nc=0;SC.scenes=[];SC.amb=[];SC.is=false;SC.sig='';SC.cc=null;SC.told=''}
 function scLoad(o){
   scReset();if(!o)return;
@@ -2512,10 +2556,11 @@ function scRender(){
   else if(!SC.is){st.textContent='This PDF doesn’t look like a screenplay, so Script mode is off.'}
   else{
     const sp=SC.scenes.filter(s=>!s.om).length;
+    scSchedUI();
     st.textContent=`Screenplay recognized: ${sp} scenes, ${SC.chars.length} characters.`+(SC.dirty?' Changes below are not on the script yet. Press Apply.':'');
   }
-  $('#scap').classList.toggle('pri',!!SC.dirty||!pages.some(p=>p.ann.some(a=>a.sc)));
-  $('#sco1').checked=SC.opt.dlg;$('#sco2').checked=SC.opt.nm;$('#sco3').checked=SC.opt.sq;$('#sco4').checked=!!SC.opt.wt;$('#scidx').checked=SC.opt.idx;
+  scApBtn(!!SC.dirty||!pages.some(p=>p.ann.some(a=>a.sc)));
+  $('#sco1').checked=SC.opt.dlg;$('#sco2').checked=SC.opt.nm;$('#sco3').checked=SC.opt.sq;$('#sco4').checked=!!SC.opt.wt;$('#scidx').checked=SC.opt.idx;$('#sco5').checked=!!SC.opt.fx;$('#sco6').checked=!!SC.opt.fxc;$('#sco7').checked=!!SC.opt.voc;
   const box=$('#sct');
   box.innerHTML=SC.chars.map((c,i)=>`<div class="scr" data-id="${scE(c.id)}"><span class="grip" title="Drag to reorder">⠿</span><button class="up" title="Move up" aria-label="Move up"${i?'':' disabled'}>↑</button><button class="dn" title="Move down" aria-label="Move down"${i<SC.chars.length-1?'':' disabled'}>↓</button><input type="checkbox" class="on" ${c.on?'checked':''} title="Include in highlights and the cast sheet" aria-label="Include"><input type="color" class="col" value="${c.color}" aria-label="Color"><input class="nm" value="${scE(c.name)}" aria-label="Name" spellcheck="false"><span class="mut inf">${c.n||0} scenes${c.sp?' · '+c.sp+' with dialogue':c.hasLines?'':' · no dialogue'}</span><button class="rmv" title="Remove from the list" aria-label="Remove">✕</button></div>`).join('')||'<p class="mut">No characters found yet.</p>';
   const al=$('#scal');$('#scan').textContent=SC.amb.length;
@@ -2533,10 +2578,12 @@ function scGrid(){
   for(const s of SC.scenes){
     const sp=[...s.sp].filter(k=>nm.has(k)).map(k=>nm.get(k)),al=[...s.pr].filter(k=>!s.sp.has(k)&&nm.has(k)).map(k=>nm.get(k));
     const tip=`Scene ${s.num}${s.om?' (omitted)':''}\n${s.head||''}\nPage ${s.pi+1}`+(sp.length?'\nSpeaks: '+sp.join(', '):'')+(al.length?'\nAlso in scene: '+al.join(', '):'');
-    h+=`<tr${s.om?' class="om"':''} title="${scE(tip)}"><td class="l"><b>${scE(s.num)}</b></td><td class="l">${scE(s.ie)}</td><td class="l">${scE(s.dn)}</td>`+ch.map(c=>s.pr.has(c.id)?`<td class="x${s.sp.has(c.id)?' s':''}" style="background:${c.color}" title="${scE(c.name)}: ${s.sp.has(c.id)?'has dialogue':'in the scene'}, scene ${scE(s.num)}">${s.sp.has(c.id)?'🔊':''}</td>`:'<td></td>').join('')+'</tr>';
+    h+=`<tr${s.om?' class="om"':''} title="${scE(tip)}"><td class="l"><b>${scE(s.num)}</b></td><td class="l">${scE(s.ie)}</td><td class="l">${scE(s.dn)}</td>`+ch.map(c=>s.pr.has(c.id)?`<td class="x${s.sp.has(c.id)?' s':''}" style="background:${c.color}" title="${scE(c.name)}: ${s.sp.has(c.id)?(s.vo&&s.vo.has(c.id)?'has voice-over':'has dialogue'):'in the scene'}, scene ${scE(s.num)}">${s.sp.has(c.id)?(s.vo&&s.vo.has(c.id)?'🎙️':'🗣️'):''}</td>`:'<td></td>').join('')+'</tr>';
   }
   g.innerHTML=h+'</tbody></table>';
 }
+// Apply button: plain while the marks need applying; once they are on the script it reads "Applied to script" with the words highlighted green.
+function scApBtn(needs){const b=$('#scap');if(!b)return;b.classList.toggle('pri',needs);b.innerHTML=needs?'Apply to script':'<span class="hlx">Applied to script</span>'}
 function scDirtyNow(){SC.dirty=true;touch();scRender()}
 function scOpen(){
   const d=$('#scd');if(!d.open)d.showModal();scRender();
@@ -2564,6 +2611,9 @@ $('#sco1').onchange=e=>{SC.opt.dlg=e.target.checked;scDirtyNow()};
 $('#sco2').onchange=e=>{SC.opt.nm=e.target.checked;scDirtyNow()};
 $('#sco3').onchange=e=>{SC.opt.sq=e.target.checked;scDirtyNow()};
 $('#sco4').onchange=e=>{SC.opt.wt=e.target.checked;scDirtyNow()};
+$('#sco5').onchange=e=>{SC.opt.fx=e.target.checked;scDirtyNow()};
+$('#sco6').onchange=e=>{SC.opt.fxc=e.target.checked;touch()};
+$('#sco7').onchange=e=>{SC.opt.voc=e.target.checked;scDirtyNow()};
 $('#scidx').onchange=e=>{SC.opt.idx=e.target.checked;touch()};
 $('#scgd').ontoggle=()=>{if($('#scgd').open)scGrid()};
 $('#scaddb').onclick=()=>{const i=$('#scadd');if(scAddSeed(i.value))i.value=''};
@@ -2579,7 +2629,7 @@ $('#sct').addEventListener('input',e=>{
   if(e.target.classList.contains('on'))c.on=e.target.checked;
   else if(e.target.classList.contains('col'))c.color=e.target.value;
   else if(e.target.classList.contains('nm')){c.name=e.target.value;c.ren=true}
-  SC.dirty=true;touch();$('#scap').classList.add('pri');$('#scs').textContent=$('#scs').textContent.replace(/ Changes below.*$/,'')+' Changes below are not on the script yet. Press Apply.';
+  SC.dirty=true;touch();scApBtn(true);$('#scs').textContent=$('#scs').textContent.replace(/ Changes below.*$/,'')+' Changes below are not on the script yet. Press Apply.';
   if($('#scgd').open&&!e.target.classList.contains('nm'))scGrid();
 });
 // drag the grip to reorder
@@ -2669,14 +2719,16 @@ async function scXlsx(){
     const base=fname.replace(/-edited\.pdf$|\.pdf$/i,'');
     const loc=s=>{let h=(s.head||'').replace(/^\s*(INT\.?\s*\/\s*EXT|EXT\.?\s*\/\s*INT|I\s*\/\s*E|INT|EXT|EST)[.\s\/-]*/i,'').trim();
       const m=h.match(/^(.*\S)\s+[-–—]\s+([^-–—]+)$/);if(m&&s.dn&&m[2].toUpperCase().includes(s.dn.toUpperCase()))h=m[1];return h};
-    const nf=5,hdr=[{v:'Scene',b:1,bd:1},{v:'Page',b:1,bd:1},{v:'I/E',b:1,bd:1},{v:'Scene heading',b:1,bd:1},{v:'D/N',b:1,bd:1},...chars.map(c=>({v:c.name,b:1,bd:1,rot:1,f:c.color}))];
-    const rows=[{cells:hdr,ht:Math.min(220,Math.max(60,Math.max(...chars.map(c=>c.name.length))*6.2+12))}];
-    for(const sc of scenes)rows.push({cells:[{v:sc.num,b:1,bd:1},{v:sc.pi+1,bd:1},{v:sc.om?'OMITTED':sc.ie,bd:1},{v:sc.om?'':loc(sc),bd:1},{v:sc.om?'':sc.dn,bd:1},
-      ...chars.map(c=>{const here=!sc.om&&sc.pr.has(c.id);return{v:here&&sc.sp.has(c.id)?'\u{1F50A}':'',bd:1,c:1,f:here?c.color:''}})]});
-    const w1=[8,6,7,Math.min(90,Math.max(20,...scenes.map(sc=>loc(sc).length+2))),11,...chars.map(()=>4.5)];
-    const k=[{cells:['Character','Color','Scenes','With dialogue'].map(v=>({v,b:1}))},...chars.map(c=>({cells:[{v:c.name},{v:'',f:c.color},{v:c.n||0},{v:c.sp||0}]}))];
+    await scSchedLoad().catch(()=>{});
+    const sdm=SC.opt.merge&&SD.one?SD.one.map:null,lab=c=>c.num?c.num+'. '+c.name:c.name,nfx=SC.opt.fxc,nvo=SC.opt.voc,nf=6+(nfx?1:0)+(nvo?1:0)+(sdm?2:0),
+      hdr=[{v:'Scene',b:1,bd:1},{v:'Page',b:1,bd:1},{v:'I/E',b:1,bd:1},{v:'Scene heading',b:1,bd:1},{v:'D/N',b:1,bd:1},{v:'Characters',b:1,bd:1},...(nfx?[{v:'Sound effects',b:1,bd:1}]:[]),...(nvo?[{v:'Voice-over',b:1,bd:1}]:[]),...(sdm?[{v:'Shooting day',b:1,bd:1},{v:'Shooting date',b:1,bd:1}]:[]),...chars.map(c=>({v:lab(c),b:1,bd:1,rot:1,f:c.color}))];
+    const rows=[{cells:hdr,ht:Math.min(220,Math.max(60,Math.max(...chars.map(c=>lab(c).length))*6.2+12))}];
+    for(const sc of scenes)rows.push({cells:[{v:sc.num,b:1,bd:1},{v:sc.pi+1,bd:1},{v:sc.om?'OMITTED':sc.ie,bd:1},{v:sc.om?'':loc(sc),bd:1},{v:sc.om?'':sc.dn,bd:1},{v:sc.om?'':chars.filter(c=>sc.pr.has(c.id)).length||'',bd:1},...(nfx?[{v:sc.om?'':[...new Set((sc.fx||[]).map(f=>f.w))].join(', '),bd:1}]:[]),...(nvo?[{v:sc.om?'':chars.filter(c=>sc.vo&&sc.vo.has(c.id)).map(c=>c.name).join(', '),bd:1}]:[]),...(sdm?(()=>{const e=sc.om?null:sdm.get(sdNum(sc.num));return[{v:e&&e.day!=null?e.day:'',bd:1},{v:e?e.date:'',bd:1}]})():[]),
+      ...chars.map(c=>{const here=!sc.om&&sc.pr.has(c.id);return{v:here&&sc.sp.has(c.id)?(sc.vo&&sc.vo.has(c.id)?'\u{1F399}\uFE0F':'\u{1F5E3}\uFE0F'):'',bd:1,c:1,f:here?c.color:''}})]});
+    const w1=[8,6,7,Math.min(90,Math.max(20,...scenes.map(sc=>loc(sc).length+2))),11,10,...(nfx?[22]:[]),...(nvo?[18]:[]),...(sdm?[11,12]:[]),...chars.map(()=>4.5)];
+    const k=[{cells:['Character','Color','Scenes','With dialogue','Voice-over scenes','Day out of days #'].map(v=>({v,b:1}))},...chars.map(c=>({cells:[{v:c.name},{v:'',f:c.color},{v:c.n||0},{v:c.sp||0},{v:scenes.filter(sc=>sc.vo&&sc.vo.has(c.id)).length||''},{v:(c.nums||[]).join(', ')}]}))];
     const col=n=>{let s='';for(n++;n>0;n=Math.floor((n-1)/26))s=String.fromCharCode(65+(n-1)%26)+s;return s};
-    const blob=xBook([{name:'Cast sheet',rows,widths:w1,freeze:true,filter:`A1:${col(nf-1)}${rows.length}`},{name:'Characters',rows:k,widths:[30,8,9,15]}]);
+    const blob=xBook([{name:'Cast sheet',rows,widths:w1,freeze:true,filter:`A1:${col(nf-1)}${rows.length}`},{name:'Characters',rows:k,widths:[30,8,9,15,17,18]}]);
     await shareFile(blob,base+'-cast-sheet.xlsx');
   }catch(err){alert('Could not export: '+err.message)}
   finally{btn.disabled=false;btn.textContent=old}
@@ -2684,6 +2736,192 @@ async function scXlsx(){
 $('#scex3').onclick=scXlsx;
 $('#fmc').onclick=()=>{const q=$('#fq').value.trim();if(!q)return;if(!SC.is){toast('Script mode needs a screenplay.');return}if(scAddSeed(q)){scOpen();toast(`Added “${q}” as a character.`)}};
 
+// ---- Production schedule pages: the one-liner and the day out of days ----
+// Pages from those two documents can sit in the same PDF as the script. They are recognised by what they say,
+// left out of script detection, and used to (1) add shooting dates to the cast sheet, (2) number and order the
+// characters like the day out of days, (3) carry the character colors onto both documents.
+var SD={key:'',kinds:[],one:null,dood:null,merge:false};
+const sdNum=s=>String(s||'').toUpperCase().replace(/[\s*]/g,'');
+async function scKinds(){
+  const out=[];
+  for(let i=0;i<pages.length;i++){
+    const p=pages[i],k=p.d+':'+p.n;SD.kc=SD.kc||{};
+    if(SD.kc[k]===undefined){
+      const rows=scGroup(await getLines(p)),T=rows.map(r=>r.segs.map(scTxt).join(' ')).join('\n');
+      let kind='';
+      if(/Day Out of Days/i.test(T)&&/Shooting Day/i.test(T))kind='dood';
+      else if(/ONELINE SCHEDULE|BEGIN DAY\s*#|END DAY\s*#/i.test(T))kind='one';
+      else{let n=0;for(const r of rows){const t=r.segs.map(q=>scTxt(q).trim());if(t.length>=4&&/^\d{1,3}[A-Z]{0,2}$/.test(t[0])&&/^(INT|EXT|I\/E)/i.test(t[1])&&t.some(x=>/^[DN]\d{1,2}(\s|$)/.test(x)))n++}if(n>=3)kind='one'}
+      SD.kc[k]=kind;
+    }
+    out.push(SD.kc[k]);
+  }
+  return out;
+}
+const CAST_RE=/^\d+[a-z]?(\s*,\s*\d+[a-z]?)*\s*,?$/i;
+function sdTokens(L,from){
+  const T=scTxt(L),out=[];let m;const re=/\d+[a-z]?/gi;re.lastIndex=from||0;
+  while((m=re.exec(T)))out.push({n:m[0].toLowerCase(),a:m.index,b:m.index+m[0].length});
+  return out;
+}
+async function scParseOne(idx){
+  const days=new Map(),scenes=[];let cur=null,last=null;
+  for(const pi of idx){
+    const rows=scGroup(await getLines(pages[pi]));
+    for(const r of rows){
+      const segs=r.segs,txt=segs.map(scTxt).join(' ').replace(/\s+/g,' ').trim();let m;
+      if((m=txt.match(/BEGIN DAY\s*#\s*(\d+)/i))){cur=+m[1];last=null;continue}
+      if((m=txt.match(/END DAY\s*#\s*(\d+)\s*-\s*([A-Za-z]+),\s*([A-Za-z]+)\s+(\d{1,2}),\s*(\d{4})/i))){days.set(+m[1],{n:+m[1],dow:m[2].slice(0,3),mon:m[3],d:+m[4],y:+m[5]});last=null;continue}
+      const t0=scTxt(segs[0]).trim();
+      if(segs.length>=3&&/^\d{1,3}[A-Z]{0,2}$/.test(t0)&&/^(INT|EXT|I\/E)/i.test(scTxt(segs[1]).trim())){
+        const o={num:t0,day:cur,loc:scTxt(segs[1]).trim(),dn:'',tok:[],castX:null,dnX:null,pi};
+        for(let k=2;k<segs.length;k++){
+          const T=scTxt(segs[k]),t=T.trim();let m2;
+          if(!o.dn&&(m2=/^\s*([DN]\d*)(?=\s|$)/.exec(T))){
+            o.dn=m2[1];o.dnX=segs[k].x0;
+            const rest=T.slice(m2[0].length);
+            if(CAST_RE.test(rest.trim())&&rest.trim()){const f=m2[0].length;o.castX=segs[k].chars[f+rest.search(/\S/)].x0;for(const q of sdTokens(segs[k],f))o.tok.push({...q,pi,L:segs[k]})}
+            continue;
+          }
+          if(/\//.test(t))continue;
+          if(o.dn&&CAST_RE.test(t)){if(o.castX==null)o.castX=segs[k].x0;for(const q of sdTokens(segs[k]))o.tok.push({...q,pi,L:segs[k]})}
+        }
+        scenes.push(o);last=o;continue;
+      }
+      if(last&&last.castX!=null&&segs.length&&Math.abs(segs[0].x0-last.castX)<=14){
+        const t=scTxt(segs[0]).trim();
+        if(CAST_RE.test(t))for(const q of sdTokens(segs[0]))last.tok.push({...q,pi,L:segs[0]});
+      }
+    }
+  }
+  const map=new Map();
+  for(const s of scenes){const d=days.get(s.day);s.date=d?`${d.dow} ${String(MON[d.mon.slice(0,3).toLowerCase()]||'').padStart(2,'0')}/${String(d.d).padStart(2,'0')}`:'';s.cast=s.tok.map(q=>q.n);if(!map.has(sdNum(s.num)))map.set(sdNum(s.num),s)}
+  return{scenes,map,days};
+}
+const MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function sdWords(segs){
+  const out=[];
+  for(const L of segs){const T=scTxt(L),re=/\S+/g;let m;while((m=re.exec(T))){const a=L.chars[m.index],b=L.chars[m.index+m[0].length-1];out.push({t:m[0],x:(a.x0+b.x1)/2})}}
+  return out;
+}
+async function scParseDood(idx){
+  const cast=new Map(),cols=[];
+  for(const pi of idx){
+    const rows=scGroup(await getLines(pages[pi]));let pc=[];
+    for(const r of rows){
+      const segs=r.segs,txt=segs.map(q=>scTxt(q).trim()).join(' ');
+      if(/Month\/Day/i.test(txt)){pc=sdWords(segs).filter(w=>/^\d{1,2}\/\d{1,2}$/.test(w.t));continue}
+      if(/Shooting Day/i.test(txt)){for(const w of sdWords(segs)){if(/^\d+$/.test(w.t)){const c=pc.slice().sort((a,b)=>Math.abs(a.x-w.x)-Math.abs(b.x-w.x))[0];if(c&&Math.abs(c.x-w.x)<14)c.day=+w.t}}for(const c of pc)cols.push({x:c.x,date:c.t,day:c.day});continue}
+      if(!pc.length)continue;
+      let m,numSeg=null,nameSeg=null,nameTxt='',num='';
+      const t0=scTxt(segs[0]).trim();
+      if((m=t0.match(/^(\d+[a-z]?)\.?\s*$/i))&&segs.length>1){num=m[1].toLowerCase();nameSeg=segs[1];numSeg=segs[0]}
+      else if((m=t0.match(/^(\d+[a-z]?)\.\s+(\S.*)$/i))){num=m[1].toLowerCase();nameSeg=segs[0];numSeg=segs[0]}
+      if(!num)continue;
+      nameTxt=scTxt(nameSeg).trim().replace(/^\d+[a-z]?\.\s*/i,'');
+      if(!/[A-Za-z]{2}/.test(nameTxt)||/^(Co\.|Work|Hold|Holiday|Start|Finish|TOTAL)/i.test(nameTxt))continue;
+      let e=cast.get(num);if(!e){e={n:num,name:nameTxt,days:{},pi:pi,L:nameSeg,numL:numSeg,rows:[]};cast.set(num,e)}
+      e.rows.push({pi,numL:numSeg,L:nameSeg});
+      for(const q of segs){if(q===nameSeg||q===numSeg)continue;const t=scTxt(q).trim();if(!/^[A-Za-z]{1,4}$/.test(t))continue;const x=(q.x0+q.x1)/2,c=pc.slice().sort((a,b)=>Math.abs(a.x-x)-Math.abs(b.x-x))[0];if(c&&Math.abs(c.x-x)<14){e.days[c.t]=t;(e.cells=e.cells||[]).push({pi,date:c.t,L:q})}}
+    }
+  }
+  return{cast:[...cast.values()],cols};
+}
+function sdNumKey(n){const m=/^(\d+)([a-z]?)$/.exec(n);return m?[+m[1],m[2]]:[1e9,n]}
+const sdCmp=(a,b)=>{const x=sdNumKey(a),y=sdNumKey(b);return x[0]-y[0]||(x[1]<y[1]?-1:x[1]>y[1]?1:0)};
+// Read whichever schedule pages are in the PDF (cached until the pages change).
+async function scSchedLoad(){
+  const key=scSig();if(SD.key===key&&SD.done)return SD;
+  const kinds=await scKinds(),one=[],dd=[];
+  kinds.forEach((k,i)=>{if(k=='one')one.push(i);else if(k=='dood')dd.push(i)});
+  SD.kinds=kinds;SD.one=one.length?await scParseOne(one):null;SD.dood=dd.length?await scParseDood(dd):null;SD.key=key;SD.done=true;
+  return SD;
+}
+// Match script characters to day-out-of-days rows. Full names from the day out of days are the most reliable ones.
+function scMatchDood(){
+  const d=SD.dood;if(!d)return{n:0};
+  const core=s=>s.toUpperCase().replace(/\([^)]*\)/g,'').replace(/\s+-\s+.*$/,'').replace(/[^A-Z' ]+/g,' ').replace(/\s+/g,' ').trim();
+  const rows=d.cast.map(e=>({e,core:core(e.name)}));
+  let n=0;const used=new Set();
+  for(const c of SC.chars){c.nums=[];c.num=''}
+  for(const c of SC.chars){
+    const mine=(c.full||c.name||'').toUpperCase().replace(/[^A-Z' ]+/g,' ').replace(/\s+/g,' ').trim(),first=(c.cue||mine).split(/\s+/)[0].toUpperCase();
+    let hit=rows.filter(r=>r.core===mine);
+    if(!hit.length&&!c.full){
+      const f=rows.filter(r=>r.core.split(' ')[0]===first);
+      const cores=[...new Set(f.map(r=>r.core))];
+      if(cores.length==1)hit=f;
+      if(!hit.length){const g=rows.filter(r=>r.core.split(' ').slice(-1)[0]===first),gc=[...new Set(g.map(r=>r.core))];if(gc.length==1)hit=g}
+    }
+    if(hit.length){c.nums=hit.map(r=>r.e.n).sort(sdCmp);c.num=c.nums[0];n++;
+      const nm=hit[0].core;if(!c.full&&nm.split(' ').length>1&&!c.ren){c.full=nm;c.name=scTitle(nm)}}
+  }
+  // the same person under a surname and under a full name: join them
+  for(const c of SC.chars.slice()){
+    if(!c.num)continue;
+    const o=SC.chars.find(x=>x!==c&&x.num==c.num&&(x.full||'').toUpperCase().split(/\s+/).slice(-1)[0]===c.id&&!c.hasLines);
+    if(o){o.al=[...new Set([...(o.al||[]),c.id])];SC.chars=SC.chars.filter(x=>x!==c);if(!SC.rm.includes(c.id))SC.rm.push(c.id)}
+  }
+  // someone known only by surname elsewhere in the script ("DAUBNER") who is really a matched character
+  for(const c of SC.chars.slice()){
+    if(c.num||c.hasLines)continue;
+    const hit=rows.find(r=>r.core.split(' ').slice(-1)[0]===c.id);
+    if(!hit)continue;
+    const owner=SC.chars.find(o=>o!==c&&o.nums&&o.nums.includes(hit.e.n));
+    if(owner){owner.al=[...new Set([...(owner.al||[]),c.id])];SC.chars=SC.chars.filter(x=>x!==c);if(!SC.rm.includes(c.id))SC.rm.push(c.id)}
+  }
+  return{n,total:d.cast.length};
+}
+function scOrderByDood(){
+  const keyOf=c=>c.num?c.num:null;
+  const m=SC.chars.filter(c=>c.num).sort((a,b)=>sdCmp(a.num,b.num)),u=SC.chars.filter(c=>!c.num);
+  SC.chars=[...m,...u];
+}
+// Colors on the schedule pages (called from Apply)
+function scSchedMarks(add,on){
+  const hl=(pi,L,a,b,c)=>{const [t,bt]=lineBox(L),x0=L.chars[a].x0,x1=L.chars[b-1].x1;add(pi,{t:'rect',x:x0-1,y:t,w:x1-x0+2,h:bt-t,c:c.color,hl:true,o:SC.opt.o,sc:c.id,...(SC.opt.wt?{wt:1}:{})})};
+  const byNum=new Map();for(const c of on.values())for(const n of c.nums||[])byNum.set(n,c);
+  if(SD.dood)for(const e of SD.dood.cast){const c=byNum.get(e.n);if(!c)continue;for(const r of e.rows){
+    if(r.numL===r.L){hl(r.pi,r.L,0,r.L.chars.length,c)}else{const a=r.numL.chars[0].x0,L=r.L,b=L.chars[L.chars.length-1].x1,[t,bt]=lineBox(L);add(r.pi,{t:'rect',x:a-1,y:t,w:b-a+2,h:bt-t,c:c.color,hl:true,o:SC.opt.o,sc:c.id,...(SC.opt.wt?{wt:1}:{})})}}}
+  if(SD.one)for(const s of SD.one.scenes)for(const q of s.tok){const c=byNum.get(q.n);if(c)hl(q.pi,q.L,q.a,q.b,c)}
+  // voice-over: a black "VO" tag after the name, and the days their VO scenes shoot filled black with white text
+  if(SC.opt.voc&&SD.dood){
+    const nd=t=>{const m=/(\d{1,2})\/(\d{1,2})/.exec(t||'');return m?(+m[1])+'/'+(+m[2]):''};
+    for(const c of on.values()){
+      const vs=SC.scenes.filter(sc=>!sc.om&&sc.vo&&sc.vo.has(c.id));if(!vs.length||!(c.nums||[]).length)continue;
+      const dates=new Set(),nums=new Set(vs.map(sc=>sdNum(sc.num)));
+      if(SD.one)for(const o of SD.one.scenes)if(nums.has(sdNum(o.num))&&o.date)dates.add(nd(o.date));
+      for(const e of SD.dood.cast){if(!c.nums.includes(e.n))continue;
+        for(const r of e.rows){const [t,bt]=lineBox(r.L),h=bt-t,z=Math.max(5,h-3.5),w=z*2.5;
+          add(r.pi,{t:'sq',x:r.L.x1+5,y:t+.5,w,h:h-1,c:'#000000',sc:'vo'});
+          add(r.pi,{t:'text',x:r.L.x1+5+w*.12,y:t+.5+(h-1-z*1.15)/2,s:z,c:'#ffffff',text:'VO',sc:'vo'})}
+        for(const q of e.cells||[])if(dates.has(nd(q.date))){const [t,bt]=lineBox(q.L);add(q.pi,{t:'rect',x:q.L.x0-3,y:t,w:q.L.x1-q.L.x0+6,h:bt-t,c:'#000000',hl:true,o:1,wt:1,sc:'vo'})}
+      }
+    }
+  }
+}
+
+function scSchedUI(){
+  const n=$('#scsd');if(!n)return;
+  const o=SD.kinds.filter(k=>k=='one').length,d=SD.kinds.filter(k=>k=='dood').length;
+  n.textContent=(o||d)?'Schedule pages found in this PDF: '+[o?`one-liner (${o} page${o>1?'s':''})`:'',d?`day out of days (${d} page${d>1?'s':''})`:''].filter(Boolean).join(', ')+'.':'No one-liner or day out of days pages in this PDF yet. Use Add pages to bring them in, then press the buttons below.';
+  const b=$('#scmg');if(b)b.innerHTML=SC.opt.merge&&SD.one?'<span class="hlx">Cast sheet merged with one-liner</span>':'Merge cast sheet with one-liner';
+}
+$('#scmg').onclick=async()=>{
+  await scSchedLoad();
+  if(!SD.one){toast('Add the one-liner pages to this PDF first (Add pages), then press this again.');scSchedUI();return}
+  SC.opt.merge=!SC.opt.merge;SC.dirty=SC.dirty;touch();
+  if(SC.opt.merge){const have=SC.scenes.filter(s=>!s.om&&SD.one.map.has(sdNum(s.num))).length,tot=SC.scenes.filter(s=>!s.om).length;toast(`Shooting dates added to the cast sheet: ${have} of ${tot} scenes are on the one-liner.`)}
+  else toast('Cast sheet no longer uses the one-liner.');
+  scSchedUI();
+};
+$('#scdd').onclick=async()=>{
+  await scSchedLoad();
+  if(!SD.dood){toast('Add the day out of days pages to this PDF first (Add pages), then press this again.');scSchedUI();return}
+  snap();const r=scMatchDood();scOrderByDood();
+  scResolve(SC.scenes,SC.cc||new Map());scDirtyNow();
+  toast(`Ordered like the day out of days: ${r.n} characters matched to its ${r.total} cast rows.`);
+};
 // ---- Phone: share sheet, reminders, install, offline ----
 var nagT=Date.now();
 const touchy=()=>matchMedia('(pointer:coarse)').matches||innerWidth<=760;
