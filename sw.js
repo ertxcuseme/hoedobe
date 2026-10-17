@@ -1,5 +1,5 @@
 // Hoedobe offline helper. Keeps a copy of the app and its libraries so it opens with no signal.
-const V = 'hoedobe-v5';
+const V = 'hoedobe-v7';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-32.png', './favicon.ico', './icon-512.png', './apple-touch-icon.png'];
 const LIBS = [
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',

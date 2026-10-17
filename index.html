@@ -99,8 +99,13 @@ body.phone #ph{position:fixed;inset:0;display:flex;flex-direction:column;align-i
 #fc{color:var(--mute);font-size:12px;min-width:74px}
 #fb button{padding:4px 9px}
 #asb.warn{border-color:#e0a030;color:#ffd27a}
+#asb{display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.15;padding-top:3px;padding-bottom:3px}
+#asb small{font-size:10px;color:var(--mute)}
+#asb.warn small{color:#e8c27a}
 #dr{pointer-events:auto;margin-top:18px;text-align:left}
 #dr p{margin:0 0 8px;text-align:center}
+#dr p.sec{margin-top:16px}
+#dr .drow{flex-wrap:wrap}
 .drow{display:flex;gap:8px;align-items:center;justify-content:center;margin:6px 0}
 dialog code{background:#1d2332;border-radius:4px;padding:1px 5px;font-size:12px}
 .hl{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:multiply}
@@ -128,6 +133,40 @@ header output{min-width:34px;color:var(--text);font-size:12px}
 .cg button.empty{background:transparent;border:1px dashed var(--line);cursor:default}
 .cg button.cur{outline:2px solid var(--acc);outline-offset:1px}
 .cg.edit button:not(.empty){outline:2px dashed var(--acc);outline-offset:1px}
+#scd{width:min(900px,96vw);max-height:92vh;overflow:auto}
+.scopts{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin:8px 0}
+.scopts label{display:flex;gap:6px;align-items:center}
+#sct{max-height:34vh;overflow:auto;border:1px solid var(--line);border-radius:8px;background:#1d2332;padding:4px}
+.scr{display:flex;gap:6px;align-items:center;padding:3px 4px;border-radius:6px}
+.scr.over{outline:2px solid var(--acc)}
+.scr .grip{cursor:grab;color:var(--mute);padding:0 4px;user-select:none}
+.scr button{padding:1px 7px;min-width:0;min-height:0}
+.scr .col{width:36px;height:28px;flex:none}
+.scr .nm,#scadd{flex:1;min-width:80px;background:#262d3d;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:4px 7px;font:inherit}
+.scr .inf{font-size:12px;white-space:nowrap}
+.sca{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0;font-size:13px}
+.sca .ctx{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:#1d2332;padding:1px 5px;border-radius:4px}
+#scam[hidden]{display:none}
+#scd summary{cursor:pointer;margin:10px 0 4px}
+#scgrid{max-height:36vh;overflow:auto;border:1px solid var(--line);border-radius:6px;background:#fff;color:#000}
+.scg{border-collapse:collapse;font-size:11px}
+.scg th{position:sticky;top:0;background:#eee;z-index:1;font-weight:600;vertical-align:bottom}
+.scg th i{display:block;writing-mode:vertical-rl;transform:rotate(180deg);font-style:normal;white-space:nowrap;margin:auto}
+.scg th span{display:block;height:5px;margin-bottom:2px}
+.scg td,.scg th{border:1px solid #ccc;padding:1px 3px;min-width:18px}
+.scg td.l,.scg th.l{text-align:left;white-space:nowrap}
+.scg td.s{font-size:10px;line-height:1;text-align:center}
+.scg tr.om{color:#888}
+@media(max-width:640px){.scr{flex-wrap:wrap}}
+.b svg.ic{width:16px;height:16px;vertical-align:-3px;margin-right:5px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pen{display:flex;align-items:center;gap:8px;color:var(--mute);font-size:12px;margin-top:10px}
+.pen>b{font-weight:500;min-width:62px;color:var(--text)}
+.pen>input{flex:1;min-width:0}
+.fw{position:relative;flex:1;height:28px;min-width:0}
+.fw input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer}
+.fw svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.fw svg polygon{fill:#8590aa}
+.fw .dot{position:absolute;top:50%;border-radius:50%;background:var(--acc);border:2px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-sizing:content-box}
 @media(max-width:640px){main{grid-template-columns:1fr}aside{display:none}}
 #nag{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bar,0px) + env(safe-area-inset-bottom,0px) + 14px);z-index:40;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;background:var(--panel);border:1px solid var(--acc);border-radius:10px;padding:10px 14px;box-shadow:0 6px 24px #000b;width:max-content;max-width:94vw}
 #nag[hidden],#inst[hidden],#copy[hidden]{display:none}
@@ -152,7 +191,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
   header [data-tool]{order:1}
   header #cbtn{order:2}header #undo{order:3}header #redo{order:4}header #save{order:5}header #copy{order:6}
   header label[for=f]{order:7}header label[for=f2]{order:8}header #fbtn{order:9}header #rvb{order:10}
-  header #hlt{order:5}header #ocr{order:11}header #flat{order:11}header #inst{order:12}header #asb{order:13;margin-left:0!important}
+  header #hlt{order:5}header #scb{order:9}header #ocr{order:11}header #flat{order:11}header #inst{order:12}header #asb{order:13;margin-left:0!important}
   .b,button{min-height:46px;min-width:46px;padding:8px 14px;font-size:15px;display:inline-flex;align-items:center;justify-content:center}
   header label.f{min-height:46px}
   input[type=number]{width:66px;height:46px;font-size:16px}
@@ -171,19 +210,20 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
   <input type="file" id="f" accept="application/pdf" hidden>
   <input type="file" id="f2" accept="application/pdf" multiple hidden>
   <span class="sep"></span>
-  <button class="b on" data-tool="select" title="Select / move (V or F1)">Select</button>
-  <button class="b" data-tool="text" title="Text (T or F2)">Text</button>
-  <button class="b" data-tool="draw" title="Draw (D or F3)">Draw</button>
-  <button class="b" data-tool="highlight" title="Highlight (H or F4)">Highlight</button>
-  <button class="b" data-tool="whiteout" title="Whiteout (W or F5)">Whiteout</button>
-  <button class="b" data-tool="sign" title="Signature (S or F6)">Sign</button>
-  <button class="b" data-tool="edittext" title="Edit existing text: click a line to rewrite it, or drag across words (E or F7)">Edit text</button>
+  <button class="b on" data-tool="select" title="Select / move (V or F1)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l12 7.5-5.3 1.6L9.4 17.5z" fill="currentColor"/></svg>Select</button>
+  <button class="b" data-tool="text" title="Text (T or F2)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M12 9v7"/></svg>Text</button>
+  <button class="b" data-tool="draw" title="Draw (D or F3)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4.5L16.5 4a2.1 2.1 0 013 3L8 18.5z"/><path d="M14.5 6l3 3"/></svg>Draw</button>
+  <button class="b" data-tool="highlight" title="Highlight (H or F4)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 3.5l5.5 5.5-7.5 7.5H8l-2-2v-4.5z"/><path d="M9 13l2 2"/><rect x="3" y="19.2" width="18" height="2.6" fill="#ffe14d" stroke="none"/></svg>Highlight</button>
+  <button class="b" data-tool="whiteout" title="Whiteout (W or F5)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3.5l5.5 5.5-8.5 9.5H7l-3.5-3.5z"/><path d="M8 11.5l5 5M10 20.5h11"/></svg>Whiteout</button>
+  <button class="b" data-tool="sign" title="Signature (S or F6)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14c3-8 5-9 5-5s-2 8 1 7 3-5 5-4 1 4 4 2"/><path d="M3 21h18"/></svg>Sign</button>
+  <button class="b" data-tool="edittext" title="Edit existing text: click a line to rewrite it, or drag across words (E or F7)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11M3 11h7M3 16h5"/><path d="M12 20l.8-3.6 6.2-6.3a1.8 1.8 0 012.6 2.6l-6.3 6.2z"/></svg>Edit text</button>
   <button id="cbtn" class="sw" title="Color" aria-label="Color" aria-haspopup="dialog" aria-expanded="false"><span id="csw"></span></button>
   <label class="f" title="Font size (Up / Down arrow keys)">Text <input type="number" id="fs" value="14" min="4" max="120"></label>
   <label class="f" title="Pen size (Left / Right arrow keys)">Pen <input type="number" id="pw" value="2" min="1" max="30"></label>
   <label class="f" title="Opacity of the active tool, or of the selected item">Opacity <input type="range" id="op" min="5" max="100" value="100" aria-label="Opacity"><output id="opo" for="op">100%</output></label>
   <span class="sep"></span>
   <button id="hlt" hidden title="Switch the text under this highlight colour between white and black, everywhere in the PDF (or double-click the highlight)">Text: white</button>
+  <button id="scb" hidden title="Script mode: color the characters, mark scenes, build a cast sheet">Script</button>
   <button id="fbtn" title="Find text in the PDF (Ctrl+F)">Find</button>
   <button id="undo" title="Undo (Ctrl+Z)">Undo</button>
   <button id="redo" title="Redo (Ctrl+Y or Ctrl+Shift+Z)">Redo</button>
@@ -209,6 +249,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
   <button id="fp" title="Previous (Shift+Enter)" aria-label="Previous match">↑</button>
   <button id="fn" title="Next (Enter)" aria-label="Next match">↓</button>
   <button id="fh" title="Turn every match into a highlight">Highlight all</button>
+  <button id="fmc" title="Script mode: turn this name into a character" hidden>Make character</button>
   <button id="fx" title="Close (Esc)" aria-label="Close search">✕</button>
 </div>
 <div id="cp" hidden role="dialog" aria-label="Color picker">
@@ -255,7 +296,8 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
     <button id="ssv" class="pri">Save and use</button>
     <button id="qbtn">Sign from phone</button>
   </div>
-  <label class="feel">Pen feel <span>Steady</span><input type="range" id="sf" min="0" max="100" value="50" aria-label="Pen feel: steady line to thick-and-thin"><span>Expressive</span></label>
+  <div class="pen"><b>Ink flow</b><span>Dry</span><input type="range" id="sfl" min="0" max="100" value="45" aria-label="Ink flow: thin and dry to thick and full"><span>Full</span></div>
+  <div class="pen"><b>Pen feel</b><span>Steady</span><span class="fw" data-pen="s"><svg viewBox="0 0 100 28" preserveAspectRatio="none"><polygon/></svg><i class="dot"></i><input type="range" id="sf" min="0" max="100" value="50" aria-label="Pen feel: steady line to thick-and-thin"></span><span>Expressive</span></div>
   <div class="row" id="qr" hidden>
     <div id="qimg"></div>
     <div><p id="qst" style="margin:0"></p><code id="qurl"></code></div>
@@ -274,6 +316,17 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
   </div>
   <p id="lst" class="mut" style="font-size:12px"></p>
   <p class="mut" style="font-size:12px">Signatures are saved in this browser. Link a file to keep an automatic copy on your computer, or use Back up to save a one-time copy.</p>
+</dialog>
+<dialog id="scd"><h2>Script mode</h2>
+  <p id="scs" class="mut" role="status"></p>
+  <div class="scopts"><label><input type="checkbox" id="sco1"> Highlight dialogue</label><label><input type="checkbox" id="sco2"> Highlight names in the action</label><label><input type="checkbox" id="sco3"> Squares at scene headings</label><label>Strength <input type="range" id="sco4" min="20" max="100" aria-label="Highlight strength"></label></div>
+  <p class="mut" style="font-size:12px;margin:4px 0">Drag a row by the dots (or use the arrows) to set the order. The same order is used for the squares and the cast sheet columns.</p>
+  <div id="sct"></div>
+  <div class="row"><input id="scadd" placeholder="Add a name Hoedobe missed" aria-label="Add a character name" autocomplete="off"><button id="scaddb">Add character</button></div>
+  <details id="scam"><summary>Needs your decision (<span id="scan">0</span>)</summary><p class="mut" style="font-size:12px">A first name in the action that fits more than one character, and nobody in the scene settles it.</p><div id="scal"></div></details>
+  <details id="scgd"><summary>Cast sheet preview (hover a scene for its details)</summary><div id="scgrid"></div></details>
+  <label class="feel" style="margin-top:8px"><input type="checkbox" id="scidx" style="flex:none"> Add scene index pages (full headings and who is in each) to exports</label>
+  <div class="row"><button id="scap" class="pri">Apply to script</button><button id="sccl">Remove marks</button><button id="scex1" style="margin-left:auto" title="The script with highlights and squares, plus the cast sheet pages at the end">Export script + cast sheet</button><button id="scex2" title="Only the cast sheet pages">Export cast sheet only</button><button id="scx">Close</button></div>
 </dialog>
 <div id="toast" hidden role="status"></div>
 <dialog id="te"><h2>Edit text</h2>
@@ -296,7 +349,8 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
     <button id="pclr">Clear</button>
     <button id="psend" class="pri">Send to computer</button>
   </div>
-  <label class="feel" style="width:min(100%,420px)">Pen feel <span>Steady</span><input type="range" id="pf" min="0" max="100" value="50" aria-label="Pen feel"><span>Expressive</span></label>
+  <div style="width:min(100%,420px)"><div class="pen"><b>Ink flow</b><span>Dry</span><input type="range" id="pfl" min="0" max="100" value="45" aria-label="Ink flow"><span>Full</span></div>
+  <div class="pen"><b>Pen feel</b><span>Steady</span><span class="fw" data-pen="p"><svg viewBox="0 0 100 28" preserveAspectRatio="none"><polygon/></svg><i class="dot"></i><input type="range" id="pf" min="0" max="100" value="50" aria-label="Pen feel"></span><span>Expressive</span></div></div>
   <p id="pst" class="mut">Connecting…</p>
 </div>
 <script>
@@ -338,7 +392,7 @@ async function addFile(f,append){
   catch(e){alert('Could not open that file. If it is password-protected, remove the password first.');return}
   if(!append){
     const prj=await readProject(pdf);
-    if(prj&&await askRestore()=='restore'){
+    if(prj&&(forceRestore||await askRestore()=='restore')){
       try{await applyProject(prj.proj,prj.srcsB);try{pdf.destroy()}catch(e){}return}
       catch(e){alert('Could not restore the edits from this file, so it opened as a plain PDF.')}
     }
@@ -386,7 +440,7 @@ function build(){
   });
   pages.forEach((_,i)=>overlay(i));
   if(fOpen)runFind(false);
-  syncUI();histUI();
+  syncUI();histUI();try{scSoon()}catch(e){}
   V.scrollTop=vs;T.scrollTop=ts;
 }
 
@@ -418,6 +472,9 @@ function overlay(i){
       const [u,v]=fwd(p,a.x,a.y);
       s+=`<image data-k="${k}" class="a${isSel(k)}" href="${srcs[a.sid]}" x="${u}" y="${v}" width="${a.w}" height="${a.h}" opacity="${oa(a)}" preserveAspectRatio="none"/>`;
       if(isSel(k))s+=`<rect x="${u}" y="${v}" width="${a.w}" height="${a.h}" fill="none" stroke="#5b8cff" stroke-dasharray="4" pointer-events="none"/><circle class="rs" data-k="${k}" cx="${u+a.w}" cy="${v+a.h}" r="7" fill="#5b8cff"/>`;
+    }else if(a.t=='sq'){
+      const [x,y,w,h]=box(a.x,a.y,a.w,a.h);
+      s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${a.c}"${a.ol?' stroke="#000" stroke-width="1.1"':''}/>`;
     }else if(a.t=='path'){
       s+=`<polyline data-k="${k}" class="a${isSel(k)}" fill="none" stroke="${a.c}" stroke-opacity="${oa(a)}" stroke-width="${a.s}" stroke-linecap="round" stroke-linejoin="round" points="${a.p.map(q=>fwd(p,q[0],q[1]).join(',')).join(' ')}"/>`;
     }
@@ -882,22 +939,22 @@ function openSig(){listSigs();clearPad();fileUI();$('#sg').showModal()}
 function addSig(src,w,h){const id='s'+Date.now();sigs.push({id,src,w,h});srcs[id]=src;persist();return id}
 
 // Pressure/speed-sensitive ink so strokes look hand-drawn. Used on desktop and on the phone.
-function attachPad(c,color,feel=()=>50){
+function attachPad(c,color,feel=()=>50,flow=()=>45){
   const g=c.getContext('2d'),k=c.width/920;
   let down=false,ink=false,lx=0,ly=0,mx=0,my=0,lw=3*k,lt=0;
   const pt=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]};
   const seg=e=>{
     const [px,py]=pt(e),dt=Math.max(1,e.timeStamp-lt),sp=Math.hypot(px-lx,py-ly)/dt/k;
-    // Pen feel: 0 = one steady width, 50 = the original look, 100 = strongly thick-and-thin.
-    const raw=(e.pointerType=='pen'&&e.pressure>0)?1.5+8*e.pressure:Math.max(2.2,7-sp*3);
-    const target=Math.max(1.2,4.5+(raw-4.5)*feel()/50)*k;
+    // Ink flow sets the thickest the line gets; Pen feel (0 steady .. 100 expressive) says how far fast or light strokes thin out from that.
+    const sl=(e.pointerType=='pen'&&e.pressure>0)?Math.min(1,e.pressure*1.4):Math.max(0,Math.min(1,(4.8-sp*3)/4.8));
+    const target=penMax(flow())*k*(1-feel()/100*.88*(1-sl));
     const w=lw*.7+target*.3,nx=(lx+px)/2,ny=(ly+py)/2;
     g.lineWidth=w;g.beginPath();g.moveTo(mx,my);g.quadraticCurveTo(lx,ly,nx,ny);g.stroke();
     mx=nx;my=ny;lx=px;ly=py;lt=e.timeStamp;lw=w;
   };
   c.onpointerdown=e=>{
     down=ink=true;c.setPointerCapture(e.pointerId);
-    [lx,ly]=pt(e);mx=lx;my=ly;lt=e.timeStamp;lw=3*k;
+    [lx,ly]=pt(e);mx=lx;my=ly;lt=e.timeStamp;lw=penMax(flow())*k;
     g.strokeStyle=g.fillStyle=color();g.lineCap=g.lineJoin='round';
     g.beginPath();g.arc(lx,ly,lw/2,0,7);g.fill();
   };
@@ -917,9 +974,23 @@ function attachPad(c,color,feel=()=>50){
     }
   };
 }
+const penMax=f=>3+f/100*13;
 const penFeel=()=>{try{const v=localStorage.getItem('hoedobe.penfeel');return v==null?50:+v}catch(e){return 50}};
-for(const id of ['sf','pf']){const el=$('#'+id);if(el){el.value=penFeel();el.oninput=()=>{try{localStorage.setItem('hoedobe.penfeel',el.value)}catch(e){}}}}
-const pad=attachPad($('#sc'),()=>$('#sk').value,penFeel);
+const penFlow=()=>{try{const v=localStorage.getItem('hoedobe.penflow');return v==null?45:+v}catch(e){return 45}};
+// The Pen feel slider draws its own result: thickest at Steady, thinning toward Expressive. The dot is the line width at that setting.
+function penPaint(g){
+  const fe=+$('#'+g+'f').value,fl=+$('#'+g+'fl').value,box=$('[data-pen="'+g+'"]'),h0=2+penMax(fl)*1.15,h1=h0*.12;
+  box.querySelector('polygon').setAttribute('points',`0,${14-h0/2} 100,${14-h1/2} 100,${14+h1/2} 0,${14+h0/2}`);
+  const d=box.querySelector('.dot'),h=h0*(1-.88*fe/100);d.style.width=d.style.height=Math.max(5,h)+'px';d.style.left=(6+fe/100*88)+'%';
+}
+for(const g of ['s','p']){
+  const f=$('#'+g+'f'),l=$('#'+g+'fl');if(!f||!l)continue;
+  f.value=penFeel();l.value=penFlow();
+  f.oninput=()=>{try{localStorage.setItem('hoedobe.penfeel',f.value)}catch(e){}penPaint(g)};
+  l.oninput=()=>{try{localStorage.setItem('hoedobe.penflow',l.value)}catch(e){}penPaint(g)};
+  penPaint(g);
+}
+const pad=attachPad($('#sc'),()=>$('#sk').value,penFeel,penFlow);
 function clearPad(){pad.clear()}
 $('#sclr').onclick=clearPad;
 $('#scl').onclick=()=>$('#sg').close();
@@ -959,7 +1030,7 @@ $('#sg').addEventListener('close',stopPhone);
 
 // Phone side: opened from the QR code as  page.html#phone=<id>
 function phoneMode(id){
-  const pp=attachPad($('#pc'),()=>$('#pk').value,penFeel),st=$('#pst');
+  const pp=attachPad($('#pc'),()=>$('#pk').value,penFeel,penFlow),st=$('#pst');
   document.body.classList.add('phone');
   if(typeof Peer=='undefined'){st.textContent='Could not load the connection library. Check your internet connection and reload.';return}
   const me=new Peer();let conn=null;
@@ -1192,7 +1263,7 @@ function packProject(){
   const o={v:1,base:A.base,fname,sid:A.sid,savedAt:Date.now(),nd:docs.length,unsaved:A.unsaved};
   o.cur=pk(cap());o.b0=baseline?pk(baseline):null;o.h=hist.map(pk);o.r=redoS.map(pk);o.S=S;
   const sg={};S.forEach(t=>{const m=/"sid":"([^"]+)"/.exec(t);if(m&&srcs[m[1]])sg[m[1]]=srcs[m[1]]});
-  o.sigs=sg;o.ocr=ocr;o.hlink=hlInk;return o;
+  o.sigs=sg;o.ocr=ocr;o.hlink=hlInk;try{o.script=scPack()}catch(e){}return o;
 }
 async function applyProject(proj,bytesList,opt={}){
   await ready;
@@ -1203,7 +1274,7 @@ async function applyProject(proj,bytesList,opt={}){
   intern.clear();
   const S=proj.S,up=pk=>pk.map(([m,an])=>[I(S[m]),an.map(i=>I(S[i]))]);
   pages=thaw(up(proj.cur));hist=proj.h.map(up);redoS=proj.r.map(up);baseline=proj.b0?up(proj.b0):cap();
-  fname=proj.fname||fname;
+  fname=proj.fname||fname;try{scLoad(proj.script)}catch(e){}
   if(opt.keepSid){newSession(proj.base);A.sid=proj.sid;A.origN=docs.length}else newSession(proj.base);
   A.base=baseOf(proj.base);A.unsaved=!!proj.unsaved;
   build();
@@ -1236,23 +1307,49 @@ async function draftNow(){
     await idb('set','draft:'+A.sid,packProject());
     let L=(await idb('get','draftIndex'))||[];
     L=L.filter(x=>x.id!==A.sid);L.unshift({id:A.sid,base:A.base,savedAt:Date.now(),unsaved:A.unsaved,pages:pages.length});
-    for(const x of L.splice(5)){await idb('del','draft:'+x.id);await idb('del','orig:'+x.id)}
+    for(const x of L.splice(8)){await idb('del','draft:'+x.id);await idb('del','orig:'+x.id)}
     await idb('set','draftIndex',L);
     A.lastDraft=Date.now();
   }catch(e){}
   chip();
 }
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let locList=[],forceRestore=false;
+async function listLocal(){
+  const by=new Map();
+  for await(const [name,h] of A.dir.entries()){
+    const m=STAMP_RE.exec(name);if(!m||h.kind!=='file')continue;
+    const t=+new Date(2000+ +m[1],+m[2]-1,+m[3],+m[4],+m[5]),k=m[6].toLowerCase(),o=by.get(k);
+    if(!o||t>o.t)by.set(k,{name,base:m[6],t,h});
+  }
+  return[...by.values()].sort((x,y)=>y.t-x.t).slice(0,8);
+}
 async function renderDrafts(){
   const box=$('#dr');if(!box)return;
-  let L=[];try{L=((await idb('get','draftIndex'))||[]).filter(x=>x.unsaved)}catch(e){}
-  if(!L.length||pages.length){box.innerHTML='';return}
-  const when=t=>new Date(t).toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'});
-  box.innerHTML='<p><strong>Unsaved work found</strong></p>'+L.map(x=>`<div class="drow"><button class="pri" data-r="${esc(x.id)}">Restore “${esc(x.base)}”</button><span class="mut">${esc(when(x.savedAt))}</span><button data-d="${esc(x.id)}" title="Discard this draft" aria-label="Discard draft of ${esc(x.base)}">✕</button></div>`).join('');
+  if(pages.length){box.innerHTML='';return}
+  let all=[];try{all=(await idb('get','draftIndex'))||[]}catch(e){}
+  const un=all.filter(x=>x.unsaved),rec=all.filter(x=>!x.unsaved);
+  let loc=[],needPerm=false;
+  if(A.dir){
+    if(A.dirOk||await dirPerm()){try{loc=(await listLocal()).filter(l=>{const d=all.find(x=>(x.base||'').toLowerCase()==l.base.toLowerCase());return !d||l.t>d.savedAt+120000})}catch(e){}}
+    else needPerm=true;
+  }
+  locList=loc;
+  if(pages.length)return;
+  const day=new Date().toDateString();
+  const when=t=>new Date(t).toDateString()==day?'Today '+new Date(t).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):new Date(t).toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  let h='';
+  if(un.length)h+='<p><strong>Unsaved work found</strong></p>'+un.map(x=>`<div class="drow"><button class="pri" data-r="${esc(x.id)}">Restore “${esc(x.base)}”</button><span class="mut">${esc(when(x.savedAt))}</span><button data-d="${esc(x.id)}" title="Discard this draft" aria-label="Discard draft of ${esc(x.base)}">✕</button></div>`).join('');
+  if(rec.length)h+='<p class="sec"><strong>Recently edited in this browser</strong></p>'+rec.map(x=>`<div class="drow"><button data-r="${esc(x.id)}">Open “${esc(x.base)}”</button><span class="mut">${esc(when(x.savedAt))}${x.pages?' · '+x.pages+(x.pages==1?' page':' pages'):''}</span><button data-d="${esc(x.id)}" title="Forget this autosave" aria-label="Forget autosave of ${esc(x.base)}">✕</button></div>`).join('');
+  if(loc.length)h+='<p class="sec"><strong>Locally saved recents</strong></p>'+loc.map((l,i)=>`<div class="drow"><button data-l="${i}">Open “${esc(l.base)}”</button><span class="mut">${esc(when(l.t))} · from your autosave folder</span></div>`).join('');
+  else if(needPerm)h+='<p class="sec"><strong>Locally saved recents</strong></p><div class="drow"><span class="mut">Your autosave folder needs permission before its files can be listed.</span><button id="drp">Allow folder access</button></div>';
+  box.innerHTML=h;
 }
 $('#dr').addEventListener('click',async e=>{
-  const r=e.target.closest('[data-r]'),d=e.target.closest('[data-d]');
+  const r=e.target.closest('[data-r]'),d=e.target.closest('[data-d]'),l=e.target.closest('[data-l]');
   try{
+    if(e.target.closest('#drp')){try{A.dirOk=(await A.dir.requestPermission({mode:'readwrite'}))==='granted'}catch(x){A.dirOk=false}asUI();renderDrafts();return}
+    if(l){const it=locList[+l.dataset.l];if(!it)return;forceRestore=true;try{await addFile(await it.h.getFile(),false)}finally{forceRestore=false}return}
     if(r){
       const id=r.dataset.r,proj=await idb('get','draft:'+id),orig=await idb('get','orig:'+id);
       await applyProject(proj,orig,{keepSid:true});
@@ -1324,15 +1421,20 @@ async function fileSave(){
 function chip(){
   const b=$('#asb');if(!b)return;
   const hm=ts=>new Date(ts).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
-  let t,warn=false;
+  let t,sub,warn=false;
+  const last=Math.max(A.lastDraft||0,A.lastFile||0),folderOk=!!(A.dir&&A.dirOk);
   if(A.err){t='Autosave: problem';warn=true}
   else if(A.dir&&!A.dirOk){t='Autosave: allow folder';warn=true}
   else if(A.saving)t='Autosave: saving…';
-  else if(A.dir&&A.lastFile)t='Autosave: saved '+hm(A.lastFile);
+  else if(last)t='Autosave: saved '+hm(last);
   else if(A.dir)t='Autosave: folder ready';
-  else if(A.lastDraft)t='Autosave: draft '+hm(A.lastDraft);
   else t='Autosave: on';
-  b.textContent=t;b.classList.toggle('warn',warn);
+  if(A.err)sub='Check the Autosave window';
+  else if(A.dir&&!A.dirOk)sub='In browser only · folder needs permission';
+  else if(folderOk&&A.lastFile)sub='Saved in browser and locally';
+  else if(folderOk)sub='In browser · folder ready';
+  else sub=A.lastDraft?'Saved in browser':'In browser';
+  b.innerHTML='<span></span><small></small>';b.firstChild.textContent=t;b.lastChild.textContent=sub;b.classList.toggle('warn',warn);
   const st=$('#ast');
   if(st)st.textContent=[A.dir?'Folder: '+A.dir.name+(A.dirOk?'':' (needs your permission)'):'',A.lastName?'Last file: '+A.lastName:'',A.err?'Problem: '+A.err:''].filter(Boolean).join('   ');
 }
@@ -1349,7 +1451,7 @@ $('#asd').onclick=async()=>{
   try{
     const root=await showDirectoryPicker({id:'hoedobe-autosave',mode:'readwrite',startIn:'documents'});
     A.dir=root.name==='Hoedobe autosave'?root:await root.getDirectoryHandle('Hoedobe autosave',{create:true});
-    A.dirOk=true;A.err='';A.stackDay='';await idb('set','adir',A.dir);
+    A.dirOk=true;A.err='';A.stackDay='';await idb('set','adir',A.dir);renderDrafts();
     if(pages.length&&A.unsaved){A.dirty=true;fileSave()}
   }catch(e){if(e.name!='AbortError')alert('Could not use that folder. Try another one, for example a new folder inside Documents.')}
   asUI();
@@ -1362,7 +1464,7 @@ $('#asu').onclick=async()=>{A.dir=null;A.dirOk=false;try{await idb('del','adir')
 $('#asn').onclick=()=>{if(!pages.length)return;A.dirty=true;A.unsaved=true;draftSave();fileSave()};
 async function initAutosave(){
   if(window.showDirectoryPicker){try{A.dir=(await idb('get','adir'))||null;if(A.dir)await dirPerm()}catch(e){A.dir=null}}
-  asUI();
+  asUI();renderDrafts();
 }
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&A.unsaved){draftSave();if(A.dir&&A.dirty)fileSave()}});
 addEventListener('pagehide',()=>{if(A.unsaved)draftSave()});
@@ -1401,6 +1503,10 @@ async function buildPdf(opts={}){
         if(a.t=='rect'&&!a.hl){
           const [x1,y1]=P(a.x,a.y),[x2,y2]=P(a.x+a.w,a.y+a.h);
           cp.drawRectangle({x:Math.min(x1,x2),y:Math.min(y1,y2),width:Math.abs(x2-x1),height:Math.abs(y2-y1),color:col(a.c),borderWidth:0});
+        }else if(a.t=='sq'){
+          const [x1,y1]=P(a.x,a.y),[x2,y2]=P(a.x+a.w,a.y+a.h),o={x:Math.min(x1,x2),y:Math.min(y1,y2),width:Math.abs(x2-x1),height:Math.abs(y2-y1),color:col(a.c),borderWidth:0};
+          if(a.ol){o.borderColor=rgb(0,0,0);o.borderWidth=1.1}
+          cp.drawRectangle(o);
         }else if(a.t=='path'){
           cp.drawSvgPath('M'+a.p.map(q=>pt(q[0],q[1])).join(' L'),{x:0,y:0,scale:1,borderColor:col(a.c),borderWidth:a.s,borderOpacity:oa(a),borderLineCap:1});
         }else if(a.t=='img'){
@@ -1444,6 +1550,7 @@ async function buildPdf(opts={}){
       out.catalog.set(PDFName.of('AcroForm'),out.context.obj({Fields:[...roots.values()],NeedAppearances:true,DA:PDFString.of('/Helv 0 Tf 0 g'),DR:{Font:{Helv:font.ref}}}));
       try{const form=out.getForm();for(const n of touched){try{const f=form.getField(n);if(f instanceof PDFTextField)f.updateAppearances(font)}catch(e){}}}catch(e){}
     }
+    if(opts.cast)await scDrawCast(out,font);
     if(opts.embed){
       // The editable copy: the original PDFs and the edit data ride along inside the file.
       for(let k=0;k<docs.length;k++)await out.attach(docs[k].bytes,'hoedobe-src-'+k+'.pdf',{mimeType:'application/pdf',description:'Original PDF (Hoedobe editable copy)'});
@@ -1806,6 +1913,567 @@ V.addEventListener('pointerdown',e=>{
   for(let k=p.ann.length-1;k>=0;k--){const a=p.ann[k];
     if(a.t=='rect'&&a.hl&&x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h){toggleHlInk(a.c);return}}
 },true);
+
+// ---- Script mode: recognise a screenplay, find characters and scenes, colour them, build a cast sheet ----
+var SC={is:false,sig:'',tok:0,chars:[],rm:[],seeds:[],dec:{},nc:0,opt:{dlg:true,nm:true,sq:true,o:.8,idx:false},scenes:[],amb:[],told:'',dirty:false,busy:''};
+const SC_HEAD=/^(INT|EXT|EST|I\s*\/\s*E)(?=[.\s\/-])/i;
+const SC_NUM=/^\d{1,3}[A-Z]{0,2}\*?$/,SC_STAR=/^\*+$/;
+const scTxt=L=>L.chars.map(c=>c.c).join('');
+const scNoLow=s=>!/[a-z]/.test(s);
+function scGroup(lines){
+  const rows=[];
+  for(const L of lines){const r=rows[rows.length-1];if(r&&Math.abs(r.y-L.y)<=.4*Math.max(L.sz,r.sz))r.segs.push(L);else rows.push({y:L.y,sz:L.sz,segs:[L]})}
+  rows.forEach(r=>r.segs.sort((a,b)=>a.x0-b.x0));return rows;
+}
+// Split a row into its scene-number margins, revision stars and the real content.
+function scSplit(row,pw){
+  const o={y:row.y,sz:row.sz,main:[],nl:null,nr:null,rlim:1e9};
+  for(const s of row.segs){
+    const t=scTxt(s).trim();
+    const tt=t.replace(/[*\s]/g,'');
+    if(SC_STAR.test(t)){if(s.x0>pw*.5)o.rlim=Math.min(o.rlim,s.x0);continue}
+    if(SC_NUM.test(tt)&&(s.x0<pw*.17||s.x0>pw*.78)){if(s.x0<pw*.5)o.nl=tt;else{o.nr=tt;o.rlim=Math.min(o.rlim,s.x0)}continue}
+    o.main.push(s);
+  }
+  return o;
+}
+// Lines that repeat on most pages (page header / footer) are not script content.
+function scHeaders(pgs){
+  const cnt=new Map();
+  for(const g of pgs){const seen=new Set();for(const r of g.rows)for(const s of r.segs){const k=Math.round(r.y/2)+'|'+scTxt(s).trim().replace(/\d+/g,'#');if(!seen.has(k)){seen.add(k);cnt.set(k,(cnt.get(k)||0)+1)}}}
+  const need=Math.max(3,.3*pgs.length),bad=new Set();
+  for(const [k,n] of cnt)if(n>=need)bad.add(k);
+  return bad;
+}
+function scLoadRows(L,pw,ph){
+  const rows=scGroup(L);return rows;
+}
+// Where does a scene heading's real text begin?
+function scHeadOf(s){
+  const f=scTxt(s),lead=f.length-f.trimStart().length,t=f.trim();
+  const m=/^(\d{1,3}[A-Z]{0,2})\s+(?=(INT|EXT|EST|I\s*\/\s*E)[.\s\/-])/i.exec(t),off=m?m[0].length:0,body=t.slice(off);
+  if(!SC_HEAD.test(body)||!scNoLow(body.slice(0,28)))return null;
+  const ch=s.chars[lead+off];if(!ch)return null;
+  let b=body,num=m?m[1]:'';const tm=/\s+(\d{1,3}[A-Z]{0,2})\*?$/.exec(b);
+  if(tm&&(!num||tm[1]===num)){b=b.slice(0,tm.index);num=num||tm[1]}
+  return{x:ch.x0,text:b.replace(/\s+/g,' ').trim(),num};
+}
+const scBin=(v,w)=>Math.round(v/w)*w;
+function scMode(m){let b=null,n=0;for(const [k,v] of m)if(v>n||(v==n&&k<b)){b=k;n=v}return[b,n]}
+function scCols(RP){
+  const hx=new Map();let nh=0;
+  for(const g of RP)for(const r of g.rows)for(const s of r.main){const h=scHeadOf(s);if(h){nh++;const b=scBin(h.x,2);hx.set(b,(hx.get(b)||0)+1)}}
+  const [A,an]=scMode(hx);if(A==null||nh<3||an<3)return{ok:false,nh};
+  const cx=new Map(),dx=new Map();let cn=0;
+  for(const g of RP)for(let i=0;i<g.rows.length-1;i++){
+    const r=g.rows[i],r2=g.rows[i+1];
+    if(r2.y-r.y>1.7*r.sz)continue;
+    for(const s of r.main){
+      const t=scTxt(s).trim(),bare=t.replace(/\([^)]*\)/g,'').trim();
+      if(s.x0<A+25||!bare||!scNoLow(bare)||/:$/.test(t)||/^\(/.test(t)||bare.length>45||!/[A-Z]/.test(bare))continue;
+      const s2=r2.main[0];if(!s2||s2.x0>=s.x0-25||s2.x0<A+12)continue;
+      cn++;const b=scBin(s.x0,3);cx.set(b,(cx.get(b)||0)+1);
+      if(!/^\(/.test(scTxt(s2).trim())){const d=scBin(s2.x0,3);dx.set(d,(dx.get(d)||0)+1)}
+    }
+  }
+  const [C,cc]=scMode(cx),[D,dc]=scMode(dx);
+  const ok=cn>=6&&cc>=5&&dc>=4&&D-A>=15&&C-D>=15;
+  return{ok,A,C,D,nh,cn};
+}
+const SC_STOP=new Set('A AN THE TO AND OF OR CUT SMASH FADE DISSOLVE INTERCUT BACK ON IN AT AS WE SUPER TITLE FLASHBACK LATER INSERT ANGLE CLOSE MAN WOMAN'.split(' '));
+function scTitle(n){
+  return n.toLowerCase().replace(/(^|[\s.-])([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\bO(['’])([a-z])/g,(m,a,b)=>'O'+a+b.toUpperCase()).replace(/\b(Mc)([a-z])/g,(m,a,b)=>a+b.toUpperCase())
+    .replace(/\b([BCDFGHJKLMNPQRSTVWXZ][bcdfghjklmnpqrstvwxz]{1,3})\b/g,(m)=>/^(Mr|Mrs|Ms|Dr|St|Jr|Sr)$/.test(m)?m:m.toUpperCase());
+}
+function scIE(h){h=h.toUpperCase();if(/^(INT\.?\s*\/\s*EXT|EXT\.?\s*\/\s*INT|I\s*\/\s*E)/.test(h))return'I/E';if(/^INT/.test(h))return'INT';if(/^EXT/.test(h))return'EXT';return''}
+function scDN(h){
+  const parts=h.toUpperCase().split(/\s+[-–—]+\s*|\s*[-–—]+\s+/);if(parts.length<2)return'';
+  const m=/\b(DAY|MORNING|AFTERNOON|NOON|MIDDAY|SUNRISE|DAWN|NIGHT|EVENING|MIDNIGHT|DUSK|SUNSET)\b/.exec(parts.slice(1).join(' '));
+  if(!m)return'';return/^(DAY|MORNING|AFTERNOON|NOON|MIDDAY|SUNRISE|DAWN)$/.test(m[1])?'D':'N';
+}
+// Walk the pages once: scenes, who speaks (with their dialogue lines) and the action lines.
+function scParse(RP,cols){
+  const {A,C,D}=cols,scenes=[],chars=new Map();
+  let cur=null,blk=null;
+  for(let gi=0;gi<RP.length;gi++){
+    const g=RP[gi];blk=null;
+    for(let ri=0;ri<g.rows.length;ri++){
+      const r=g.rows[ri];
+      if(r.main.length!=1){blk=null;if(!r.main.length&&cur&&r.nl&&!cur.num)cur.num=r.nl;continue}
+      const s=r.main[0],t=scTxt(s).trim(),x=s.x0,hd=scHeadOf(s);
+      if(hd&&Math.abs(hd.x-A)<=10){
+        cur={i:scenes.length,num:hd.num||r.nl||r.nr||'',head:hd.text,pi:g.pi,y:r.y,sz:r.sz,L:s,hx1:s.x1,rlim:r.rlim,om:false,blocks:[],acts:[],sp:new Set(),pr:new Set(),mens:[]};
+        scenes.push(cur);blk=null;
+        // a long heading may wrap onto a second row
+        for(let k=ri+1;k<g.rows.length;k++){const q=g.rows[k],qs=q.main[0];if(q.main.length!=1||q.y-g.rows[k-1].y>1.35*q.sz||Math.abs(qs.x0-A)>8)break;const qt=scTxt(qs).trim();if(!scNoLow(qt)||/:$/.test(qt)||scHeadOf(qs))break;cur.head+=' '+qt;g.rows[k]={...q,main:[],skip:true};ri=k}
+        continue;
+      }
+      if(r.skip||!cur)continue;
+      if(Math.abs(x-A)<=8&&/^OMITTED\b/i.test(t)){cur.om=true;if(!cur.num&&(r.nl||r.nr))cur.num=r.nl||r.nr;blk=null;continue}
+      if(/^\(?\s*(MORE|CONT'?D?\.?|CONTINUED)\s*\)?$/i.test(t))continue;
+      const bare=t.replace(/\([^)]*\)/g,'').replace(/\*+$/,'').trim();
+      if(Math.abs(x-C)<=10&&bare&&scNoLow(bare)&&/[A-Z]/.test(bare)&&!/:$/.test(t)&&!/^\(/.test(t)&&bare.length<=45){
+        let key=bare.toUpperCase().replace(/\s+/g,' ');{const w=key.split(' ');if(w.length%2==0&&w.slice(0,w.length/2).join(' ')==w.slice(w.length/2).join(' '))key=w.slice(0,w.length/2).join(' ')}
+        if(!chars.has(key))chars.set(key,{id:key,cue:key,hasLines:true,first:cur.i});
+        blk={key,rows:[{pi:g.pi,L:s}]};cur.blocks.push(blk);cur.sp.add(key);continue;
+      }
+      if(blk&&/^\(/.test(t)&&x>D-6&&x<C){blk.rows.push({pi:g.pi,L:s});continue}
+      if(blk&&Math.abs(x-D)<=8){blk.rows.push({pi:g.pi,L:s});continue}
+      blk=null;
+      if(Math.abs(x-A)<=8)cur.acts.push({pi:g.pi,L:s});
+    }
+  }
+  return{scenes,chars};
+}
+function scAliasMap(){
+  const al=new Map(),add=(txt,id)=>{const k=String(txt).toUpperCase().replace(/[^A-Z ]+/g,' ').replace(/\s+/g,' ').trim();if(k.length<2)return;(al.get(k)||al.set(k,new Set()).get(k)).add(id)};
+  for(const c of SC.chars){add(c.cue||c.name,c.id);if(c.full)add(c.full,c.id);add((c.cue||c.name).split(/\s+/)[0],c.id);for(const a of c.al||[])add(a,c.id)}
+  let max=1;for(const k of al.keys())max=Math.max(max,k.split(' ').length);
+  return{al,max};
+}
+const SC_WORD=/[A-Za-z]+/g;
+function scMentions(L,AM){
+  const T=scTxt(L),W=[];let m;SC_WORD.lastIndex=0;
+  while((m=SC_WORD.exec(T)))W.push({w:m[0],i:m.index,e:m.index+m[0].length});
+  const out=[],ok=w=>/^[A-Z]+$/.test(w)||/^[A-Z][a-z]+$/.test(w);
+  for(let i=0;i<W.length;i++){
+    let hit=null;
+    for(let k=Math.min(AM.max,W.length-i);k>=1&&!hit;k--){
+      let good=true;for(let j=0;j<k;j++){if(!ok(W[i+j].w)||(j&&T.slice(W[i+j-1].e,W[i+j].i)!==' ')){good=false;break}}
+      if(!good)continue;
+      const key=W.slice(i,i+k).map(q=>q.w.toUpperCase()).join(' '),c=AM.al.get(key);
+      if(c)hit={i0:W[i].i,i1:W[i+k-1].e,key,cands:[...c],k};
+    }
+    if(hit){out.push(hit);i+=hit.k-1}
+  }
+  return out;
+}
+// "JASPER LEE, late 40's" in the action tells us the full name behind the cue "JASPER".
+function scIntros(scenes,cues){
+  const found=[];
+  const RE=/\b([A-Z][A-Z'’.\-]+(?:\s+[A-Z][A-Z'’.\-]+){0,2})\s*[,(]\s*(?:(?:early|mid|late|around|about)[\s-]+)?\d{1,2}(?:['’]?s)?\b/g;
+  for(const sc of scenes)for(const a of sc.acts){
+    const T=scTxt(a.L);let m;RE.lastIndex=0;
+    while((m=RE.exec(T))){
+      let toks=m[1].replace(/[.,]+$/,'').split(/\s+/);
+      while(toks.length&&SC_STOP.has(toks[0]))toks.shift();
+      if(!toks.length||toks.join(' ').length<3)continue;
+      found.push({toks,scene:sc.i});
+    }
+  }
+  return found;
+}
+async function scPageRows(pi){
+  const p=pages[pi],L=await getLines(p);
+  return{pi,pw:p.w,ph:p.h,rows:scGroup(L).map(r=>scSplit(r,p.w))};
+}
+function scPrune(RP){
+  // rows were split already; rebuild keys from main segments
+  const cnt=new Map();
+  for(const g of RP){const seen=new Set();for(const r of g.rows)for(const s of r.main){const k=Math.round(r.y/2)+'|'+scTxt(s).trim().replace(/\d+/g,'#');if(!seen.has(k)){seen.add(k);cnt.set(k,(cnt.get(k)||0)+1)}}}
+  const need=Math.max(3,.3*RP.length);
+  for(const g of RP)for(const r of g.rows){
+    r.main=r.main.filter(s=>{const k=Math.round(r.y/2)+'|'+scTxt(s).trim().replace(/\d+/g,'#');return !(cnt.get(k)>=need&&(r.y<g.ph*.12||r.y>g.ph*.9))});
+  }
+}
+const scYield=()=>new Promise(r=>setTimeout(r,0));
+function scSample(n){
+  if(n<=14)return[...Array(n).keys()].slice(n>2?1:0);
+  const o=[];for(let k=0;k<14;k++)o.push(1+Math.floor(k*(n-1)/14));return[...new Set(o)];
+}
+async function scScan(force){
+  const tok=++SC.tok;
+  if(!pages.length){SC.is=false;SC.scenes=[];scUI();return false}
+  SC.busy='Looking at the pages…';scUI();
+  // 1) cheap check on a sample of pages: does this look like a screenplay at all?
+  const samp=[];for(const i of scSample(pages.length)){samp.push(await scPageRows(i));if(tok!=SC.tok)return false}
+  scPrune(samp);
+  const sc0=scCols(samp);
+  if(!sc0.ok){SC.is=false;SC.scenes=[];SC.amb=[];SC.busy='';scUI();return false}
+  // 2) the whole script
+  const RP=[];
+  for(let i=0;i<pages.length;i++){
+    RP.push(await scPageRows(i));
+    if(i%6==5){SC.busy=`Reading the script… page ${i+1} of ${pages.length}`;scUI();await scYield()}
+    if(tok!=SC.tok)return false;
+  }
+  scPrune(RP);
+  const cols=scCols(RP);
+  if(!cols.ok){SC.is=false;SC.scenes=[];SC.busy='';scUI();return false}
+  SC.busy='Finding characters…';scUI();await scYield();
+  const {scenes,chars}=scParse(RP,cols);
+  scResolve(scenes,chars);
+  SC.cc=chars;SC.is=true;SC.scenes=scenes;SC.cols=cols;SC.busy='';scUI();
+  return true;
+}
+// Characters, name matches, who is in which scene.
+function scResolve(scenes,cueChars){
+  // merge cue characters into the saved list (keeps the user's order, colours and edits)
+  const have=new Map(SC.chars.map(c=>[c.id,c]));
+  const rm=new Set(SC.rm);
+  for(const [id,c] of cueChars){
+    if(rm.has(id))continue;
+    if(!have.has(id)){const n={id,cue:id,name:scTitle(id),color:scColor(SC.nc++),on:true,hasLines:true};SC.chars.push(n);have.set(id,n)}
+    else have.get(id).cue=id,have.get(id).hasLines=true;
+  }
+  // introductions: full names, and people who never speak
+  const intros=scIntros(scenes);
+  const first=id=>id.split(/\s+/)[0];
+  for(const it of intros){
+    const toks=it.toks;let done=false;
+    for(let k=0;k<toks.length&&!done;k++){
+      const sub=toks.slice(k),cands=SC.chars.filter(c=>c.cue&&first(c.cue)==sub[0]);
+      if(!cands.length)continue;
+      let pick=null;
+      for(const c of cands){const ct=c.cue.split(' ');if(ct.length==1){if(sub.length>1&&cands.filter(q=>q.cue.split(' ').length==1).length==1)pick=c}else if(sub[1]&&sub[1][0]==ct[1][0]&&(ct[1].length==1||sub[1].startsWith(ct[1])))pick=c}
+      if(!pick&&cands.length==1&&cands[0].cue.split(' ').length==1)pick=cands[0];
+      if(pick){if(sub.length>1&&pick.cue.split(' ').length==1&&!pick.full)pick.full=sub.join(' ');done=true}
+    }
+    if(!done&&!toks.some(t=>SC_STOP.has(t))){
+      const id=toks.slice(-2).join(' ');
+      if(!have.has(id)&&!rm.has(id)&&!SC.chars.some(c=>c.cue&&first(c.cue)==toks[0])){const n={id,name:scTitle(id),color:scColor(SC.nc++),on:true,hasLines:false};SC.chars.push(n);have.set(id,n)}
+    }
+  }
+  for(const s of SC.seeds){const id=s.toUpperCase();if(!have.has(id)&&!rm.has(id)){const n={id,name:scTitle(id),color:scColor(SC.nc++),on:true,hasLines:false,seed:true};SC.chars.push(n);have.set(id,n)}}
+  // drop characters nothing in the script supports any more
+  SC.chars=SC.chars.filter(c=>cueChars.has(c.id)||c.seed||c.hasLines===false||c.full);
+  // names in the action
+  const AM=scAliasMap();
+  for(const sc of scenes){
+    sc.mens=[];sc.pr=new Set(sc.sp);
+    for(const a of sc.acts)for(const m of scMentions(a.L,AM)){
+      const cands=m.cands.filter(id=>!rm.has(id));if(!cands.length)continue;
+      sc.mens.push({pi:a.pi,L:a.L,i0:m.i0,i1:m.i1,cands,key:cands.length==1?cands[0]:null,txt:scTxt(a.L)});
+    }
+    for(const m of sc.mens)if(m.key)sc.pr.add(m.key);
+  }
+  const amb=[];
+  for(const sc of scenes)for(const m of sc.mens){
+    if(m.key)continue;
+    m.sk=sc.i+'|'+Math.round(m.L.y)+'|'+Math.round(m.L.chars[m.i0].x0)+'|'+m.txt.slice(m.i0,m.i1);
+    const here=m.cands.filter(id=>sc.pr.has(id));
+    if(here.length==1)m.key=here[0];
+    else if(SC.dec[m.sk]!==undefined){m.key=SC.dec[m.sk]||null;m.dec=true}
+    else{m.amb=true;amb.push({sc:sc.i,m})}
+    if(m.key)sc.pr.add(m.key);
+  }
+  SC.amb=amb;
+  // numbers for scenes that carry none
+  scenes.forEach((s,i)=>{if(!s.num)s.num=String(i+1);s.ie=scIE(s.head);s.dn=scDN(s.head);if(s.om){s.ie='';s.dn=''}});
+  const st=new Map(SC.chars.map(c=>[c.id,{n:0,sp:0}]));
+  for(const s of scenes){for(const k of s.pr){const q=st.get(k);if(q)q.n++}for(const k of s.sp){const q=st.get(k);if(q)q.sp++}}
+  SC.chars.forEach(c=>{const q=st.get(c.id)||{n:0,sp:0};c.n=q.n;c.sp=q.sp});
+}
+function scColor(n){
+  const H=[0,210,120,45,285,170,330,75,20,240,190,305],ring=Math.floor(n/12),k=n%12;
+  const h=(H[k]+ring*14)%360,s=[.78,.66,.62][ring%3],l=[.72,.56,.84][ring%3];
+  const a=s*Math.min(l,1-l),f=q=>{const kk=(q+h/30)%12,v=l-a*Math.max(-1,Math.min(kk-3,9-kk,1));return Math.round(v*255).toString(16).padStart(2,'0')};
+  return'#'+f(0)+f(8)+f(4);
+}
+// ---- marks on the script: highlights, name highlights, scene squares ----
+const scSig=()=>pages.map(p=>p.d+':'+p.n).join(',')+'|'+docs.map(d=>d.bytes.length).join(',')+'|'+Object.keys(ocr).length;
+const scDk=()=>docs[0]?docs[0].bytes.length+':'+docs[0].pdf.numPages:'';
+function scSquares(sc,order,add){
+  if(sc.om)return;
+  const ids=order.filter(c=>sc.pr.has(c.id));if(!ids.length)return;
+  const p=pages[sc.pi];if(!p)return;
+  const [t,b]=lineBox(sc.L),mid=(t+b)/2,size=ids.length>12?5.5:6.5,g=1.6;
+  const xr=Math.min(sc.rlim-5,p.w-22),xs=sc.hx1+8;
+  const cap=(a,z)=>Math.max(0,Math.floor((z-a+g)/(size+g)));
+  let c0=cap(xs,xr);if(c0<ids.length&&c0<4)c0=0;
+  const inline=ids.slice(0,Math.min(ids.length,c0)),rest=ids.slice(inline.length);
+  const put=(list,cy)=>list.forEach((c,k)=>add(sc.pi,{t:'sq',x:xr-(list.length-k)*(size+g)+g,y:cy-size/2,w:size,h:size,c:c.color,ol:sc.sp.has(c.id)?1:0,sc:c.id}));
+  if(inline.length)put(inline,mid);
+  if(rest.length){
+    const per=Math.max(1,cap(sc.L.x0,xr));
+    for(let r=0,k=0;k<rest.length;r++,k+=per)put(rest.slice(k,k+per),t-size/2-1.5-r*(size+g));
+  }
+}
+async function scApply(){
+  if(!SC.is)return;
+  if(SC.sig!==scSig()){SC.sig=scSig();await scScan()}
+  snap();
+  pages.forEach(p=>{p.ann=p.ann.filter(a=>!a.sc)});
+  const act=SC.chars.filter(c=>c.on),on=new Map(act.map(c=>[c.id,c]));
+  const add=(pi,a)=>{if(pages[pi])pages[pi].ann.push(a)};
+  const rect=(pi,L,x0,x1,c)=>{const [t,b]=lineBox(L);add(pi,{t:'rect',x:x0-1,y:t,w:x1-x0+2,h:b-t,c:c.color,hl:true,o:SC.opt.o,sc:c.id})};
+  for(const sc of SC.scenes){
+    if(SC.opt.dlg)for(const bl of sc.blocks){const c=on.get(bl.key);if(c)for(const r of bl.rows)rect(r.pi,r.L,r.L.x0,r.L.x1,c)}
+    if(SC.opt.nm)for(const m of sc.mens){const c=m.key&&on.get(m.key);if(c)rect(m.pi,m.L,m.L.chars[m.i0].x0,m.L.chars[m.i1-1].x1,c)}
+    if(SC.opt.sq)scSquares(sc,act,add);
+  }
+  pages.forEach((_,i)=>overlay(i));
+  SC.dirty=false;touch();scUI();
+}
+function scClear(){
+  if(!pages.some(p=>p.ann.some(a=>a.sc)))return;
+  snap();pages.forEach(p=>{p.ann=p.ann.filter(a=>!a.sc)});pages.forEach((_,i)=>overlay(i));touch();scUI();
+}
+// ---- cast sheet pages (drawn into the exported PDF) ----
+function scInitials(chars){
+  const used=new Set(),out=new Map();
+  for(const c of chars){
+    const w=c.name.replace(/[^A-Za-z0-9 ]/g,' ').trim().split(/\s+/).filter(Boolean);
+    let base=w.length>1?w.slice(0,3).map(x=>x[0]).join(''):(w[0]||'?').slice(0,2);
+    base=base.toUpperCase();let v=base,n=2;
+    if(used.has(v)&&w.length==1)v=w[0].slice(0,3).toUpperCase();
+    while(used.has(v))v=base+(n++);
+    used.add(v);out.set(c.id,v);
+  }
+  return out;
+}
+function scSpeaker(pg,x,y,w,h,K){   // little loudspeaker with sound waves, centred in a cell
+  const sc=Math.min(h-3.5,9.5)/10,iw=11*sc,ox=x+(w-iw)/2,oy=y+h-(h-10*sc)/2;
+  pg.drawSvgPath('M0 3.5 H2.4 L5.6 1 V9 L2.4 6.5 H0 Z',{x:ox,y:oy,scale:sc,color:K,borderWidth:0});
+  pg.drawSvgPath('M7.1 3.2 Q8.5 5 7.1 6.8',{x:ox,y:oy,scale:sc,borderColor:K,borderWidth:1.1,borderLineCap:1});
+  pg.drawSvgPath('M8.7 1.7 Q11.3 5 8.7 8.3',{x:ox,y:oy,scale:sc,borderColor:K,borderWidth:1.1,borderLineCap:1});
+}
+async function scDrawCast(out,font){
+  const {rgb,degrees,StandardFonts}=PDFLib,bold=await out.embedFont(StandardFonts.HelveticaBold);
+  const chars=SC.chars.filter(c=>c.on),scenes=SC.scenes;
+  if(!chars.length||!scenes.length)return 0;
+  const S=s=>String(s).replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/[\u2013\u2014]/g,'-').replace(/[^\x20-\x7E -ÿ]/g,'?');
+  const hx=h=>rgb(parseInt(h.slice(1,3),16)/255,parseInt(h.slice(3,5),16)/255,parseInt(h.slice(5,7),16)/255);
+  const K=rgb(0,0,0),GR=rgb(.8,.8,.8),MU=rgb(.4,.4,.4);
+  const compact=chars.length>40,per=compact?44:40,ini=scInitials(chars);
+  const chunks=[];for(let i=0;i<chars.length;i+=per)chunks.push(chars.slice(i,i+per));
+  const PW=792,PH=612,M=28,LW=84,RH=13.5,HH=compact?20:Math.min(330,Math.ceil(Math.max(...chars.map(c=>font.widthOfTextAtSize(S(c.name),8))))+14);
+  const title=S('Cast sheet - '+fname.replace(/-edited\.pdf$|\.pdf$/i,''));
+  const fit=(t,f,z,w)=>{t=S(t);if(f.widthOfTextAtSize(t,z)<=w)return t;while(t.length>1&&f.widthOfTextAtSize(t+'...',z)>w)t=t.slice(0,-1);return t+'...'};
+  let pc=0;
+  for(let ci=0;ci<chunks.length;ci++){
+    const ch=chunks[ci],cw=Math.min(compact?20:30,Math.max(12,(PW-2*M-LW)/ch.length));
+    const top=PH-M-34,rows=Math.floor((top-HH-M-12)/RH);
+    for(let r0=0;r0<scenes.length;r0+=rows){
+      const pg=out.addPage([PW,PH]);pc++;
+      pg.drawText(title,{x:M,y:PH-M-10,size:12,font:bold,color:K});
+      const sub=(chunks.length>1?`Characters ${ci*per+1}-${ci*per+ch.length} of ${chars.length}   `:'')+`Scenes ${scenes[r0].num} to ${scenes[Math.min(scenes.length,r0+rows)-1].num}`;
+      pg.drawText(S(sub),{x:M,y:PH-M-23,size:7.5,font,color:MU});
+      pg.drawText('Scene',{x:M+2,y:top-HH+3,size:6.5,font:bold,color:K});pg.drawText('I/E',{x:M+34,y:top-HH+3,size:6.5,font:bold,color:K});pg.drawText('D/N',{x:M+60,y:top-HH+3,size:6.5,font:bold,color:K});
+      ch.forEach((c,j)=>{
+        const x=M+LW+j*cw;
+        if(compact){
+          pg.drawRectangle({x:x+.5,y:top-HH+2,width:cw-1,height:HH-4,color:hx(c.color),borderColor:GR,borderWidth:.3});
+          const t=ini.get(c.id),z=6.5,w=bold.widthOfTextAtSize(t,z);pg.drawText(t,{x:x+(cw-w)/2,y:top-HH+7,size:z,font:bold,color:K});
+        }else{
+          pg.drawRectangle({x:x+1,y:top-6,width:cw-2,height:5,color:hx(c.color)});
+          pg.drawText(S(c.name),{x:x+cw/2+3,y:top-HH+3,size:8,font,color:K,rotate:degrees(90)});
+        }
+      });
+      const last=Math.min(scenes.length,r0+rows);
+      for(let i=r0;i<last;i++){
+        const s=scenes[i],y=top-HH-(i-r0+1)*RH;
+        pg.drawText(S(s.num),{x:M+2,y:y+4,size:7.5,font:bold,color:K});
+        if(s.om)pg.drawText('OMITTED',{x:M+34,y:y+4,size:6.5,font,color:MU});
+        else{pg.drawText(S(s.ie),{x:M+34,y:y+4,size:6.5,font,color:K});pg.drawText(S(s.dn),{x:M+62,y:y+4,size:6.5,font,color:K})}
+        pg.drawLine({start:{x:M,y},end:{x:M+LW+ch.length*cw,y},thickness:.3,color:GR});
+        if(s.om)continue;
+        ch.forEach((c,j)=>{
+          const x=M+LW+j*cw;
+          if(s.pr.has(c.id)){
+            pg.drawRectangle({x:x+.5,y:y+.5,width:cw-1,height:RH-1,color:hx(c.color)});
+            if(s.sp.has(c.id))scSpeaker(pg,x,y,cw,RH,K);
+          }
+        });
+      }
+      const gy=top-HH-(last-r0)*RH;
+      for(let j=0;j<=ch.length;j++)pg.drawLine({start:{x:M+LW+j*cw,y:top-HH},end:{x:M+LW+j*cw,y:gy},thickness:.3,color:GR});
+      // legend
+      pg.drawRectangle({x:M,y:M-6,width:9,height:9,color:rgb(.75,.75,.75)});pg.drawText('in the scene',{x:M+13,y:M-4,size:7,font,color:MU});
+      pg.drawRectangle({x:M+80,y:M-6,width:9,height:9,color:rgb(.75,.75,.75)});scSpeaker(pg,M+80,M-6,9,9,K);pg.drawText('has dialogue',{x:M+93,y:M-4,size:7,font,color:MU});
+    }
+  }
+  // character key
+  const KR=15,perK=Math.floor((792-2*M-40)/KR);
+  for(let k=0;k<chars.length;k+=perK){
+    const pg=out.addPage([612,792]);pc++;
+    pg.drawText(S(k?'Characters (continued)':'Characters'),{x:M,y:792-M-12,size:13,font:bold,color:K});
+    let y=792-M-40;
+    pg.drawText(compact?'Initials':'',{x:M+16,y:y+3,size:7,font:bold,color:MU});pg.drawText('Name',{x:M+compact*50+16,y:y+3,size:7,font:bold,color:MU});
+    pg.drawText('Scenes',{x:430,y:y+3,size:7,font:bold,color:MU});pg.drawText('With dialogue',{x:490,y:y+3,size:7,font:bold,color:MU});
+    for(const c of chars.slice(k,k+perK)){
+      y-=KR;
+      pg.drawRectangle({x:M,y:y,width:11,height:11,color:hx(c.color),borderColor:GR,borderWidth:.3});
+      let x=M+16;if(compact){pg.drawText(ini.get(c.id),{x:x,y:y+2.5,size:8,font:bold,color:K});x+=50}
+      pg.drawText(fit(c.name,font,9,400-x),{x,y:y+2.5,size:9,font,color:K});
+      pg.drawText(String(c.n||0),{x:430,y:y+2.5,size:8.5,font,color:K});pg.drawText(String(c.sp||0),{x:490,y:y+2.5,size:8.5,font,color:K});
+    }
+  }
+  pc++;
+  // optional scene index (full heading, who is in it)
+  if(SC.opt.idx){
+    const nm=new Map(chars.map(c=>[c.id,c.name])),LH=9,W=612-2*M-90;
+    let pg=null,y=0;
+    const np=()=>{pg=out.addPage([612,792]);pc++;pg.drawText('Scene index',{x:M,y:792-M-12,size:13,font:bold,color:K});pg.drawText('Names are in their character colors. Underlined = has dialogue in the scene.',{x:M+90,y:792-M-12,size:7,font,color:MU});y=792-M-36};
+    np();
+    for(const s of scenes){
+      const words=S((s.head||'')).split(' '),lines=[];let cur='';
+      for(const w of words){const t=cur?cur+' '+w:w;if(font.widthOfTextAtSize(t,8)>W&&cur){lines.push(cur);cur=w}else cur=t}if(cur)lines.push(cur);
+      const mem=[...s.pr].filter(k=>nm.has(k)).sort((p,q)=>(s.sp.has(q)-s.sp.has(p))).map(k=>({t:S(nm.get(k)),c:chars.find(c=>c.id==k).color,u:s.sp.has(k)}));
+      // lay the names out as coloured chips, wrapping at the right edge
+      const rows=[[]];let cx=0;const NZ=7,sepW=font.widthOfTextAtSize('  ',NZ),labW=font.widthOfTextAtSize('In scene: ',NZ);
+      if(mem.length){cx=labW;for(const m of mem){m.w=font.widthOfTextAtSize(m.t,NZ);if(cx+m.w>W&&rows[rows.length-1].length){rows.push([]);cx=0}m.x=cx;rows[rows.length-1].push(m);cx+=m.w+sepW}}
+      const nr=mem.length?rows.length:0,need=(lines.length+nr)*LH+4+(nr?1.5:0);
+      if(y-need<M+10)np();
+      pg.drawText(S(s.num),{x:M,y:y-LH+1,size:8,font:bold,color:K});
+      pg.drawText(S('p.'+(s.pi+1)),{x:M+34,y:y-LH+1,size:7,font,color:MU});
+      lines.forEach((l,i)=>pg.drawText(l,{x:M+90,y:y-(i+1)*LH+1,size:8,font:i?font:bold,color:K}));
+      if(nr){
+        const y0=y-(lines.length)*LH-1.5;
+        rows.forEach((r,ri)=>{
+          const by=y0-(ri+1)*LH+1;
+          if(!ri)pg.drawText('In scene:',{x:M+90,y:by,size:NZ,font,color:MU});
+          for(const m of r){
+            pg.drawRectangle({x:M+90+m.x-1,y:by-1.8,width:m.w+2,height:NZ+2.4,color:hx(m.c)});
+            pg.drawText(m.t,{x:M+90+m.x,y:by,size:NZ,font,color:K});
+            if(m.u)pg.drawLine({start:{x:M+90+m.x,y:by-1.2},end:{x:M+90+m.x+m.w,y:by-1.2},thickness:.7,color:K});
+          }
+        });
+      }
+      y-=need;
+    }
+  }
+  return pc;
+}
+async function scCastPdf(){
+  const {PDFDocument,StandardFonts}=PDFLib,out=await PDFDocument.create(),font=await out.embedFont(StandardFonts.Helvetica);
+  await scDrawCast(out,font);return await out.save();
+}
+// ---- Script mode: the panel ----
+const scE=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function scPack(){return{chars:SC.chars.map(c=>({id:c.id,cue:c.cue,name:c.name,color:c.color,on:c.on,hasLines:c.hasLines,full:c.full,seed:c.seed,al:c.al,ren:c.ren})),rm:SC.rm,seeds:SC.seeds,dec:SC.dec,nc:SC.nc,opt:SC.opt,dk:SC.dk||scDk(),told:SC.told}}
+function scReset(){SC.chars=[];SC.rm=[];SC.seeds=[];SC.dec={};SC.nc=0;SC.scenes=[];SC.amb=[];SC.is=false;SC.sig='';SC.cc=null;SC.told=''}
+function scLoad(o){
+  scReset();if(!o)return;
+  SC.chars=(o.chars||[]).map(c=>({...c}));SC.rm=o.rm||[];SC.seeds=o.seeds||[];SC.dec=o.dec||{};SC.nc=o.nc||0;SC.opt={...SC.opt,...(o.opt||{})};SC.dk=o.dk||'';SC.told=o.told||'';
+}
+let scT=0;
+function scSoon(){
+  clearTimeout(scT);
+  scT=setTimeout(async()=>{
+    if(!pages.length||!docs.length){SC.is=false;scUI();return}
+    const dk=scDk();if(SC.dk&&SC.dk!==dk)scReset();SC.dk=dk;
+    const sig=scSig();if(sig===SC.sig)return;SC.sig=sig;
+    const ok=await scScan();
+    if(ok&&SC.told!==dk){SC.told=dk;toast(`Script recognized: ${SC.scenes.length} scenes, ${SC.chars.length} characters. Open the Script button to color them.`)}
+  },1200);
+}
+function scUI(){
+  const b=$('#scb');if(b)b.hidden=!SC.is;
+  const f=$('#fmc');if(f)f.hidden=!SC.is;
+  const d=$('#scd');if(!d||!d.open)return;
+  scRender();
+}
+function scRender(){
+  const st=$('#scs');
+  if(SC.busy){st.textContent=SC.busy}
+  else if(!SC.is){st.textContent='This PDF doesn’t look like a screenplay, so Script mode is off.'}
+  else{
+    const sp=SC.scenes.filter(s=>!s.om).length;
+    st.textContent=`Screenplay recognized: ${sp} scenes, ${SC.chars.length} characters.`+(SC.dirty?' Changes below are not on the script yet. Press Apply.':'');
+  }
+  $('#scap').classList.toggle('pri',!!SC.dirty||!pages.some(p=>p.ann.some(a=>a.sc)));
+  $('#sco1').checked=SC.opt.dlg;$('#sco2').checked=SC.opt.nm;$('#sco3').checked=SC.opt.sq;$('#sco4').value=Math.round(SC.opt.o*100);$('#scidx').checked=SC.opt.idx;
+  const box=$('#sct');
+  box.innerHTML=SC.chars.map((c,i)=>`<div class="scr" data-id="${scE(c.id)}"><span class="grip" title="Drag to reorder">⠿</span><button class="up" title="Move up" aria-label="Move up"${i?'':' disabled'}>↑</button><button class="dn" title="Move down" aria-label="Move down"${i<SC.chars.length-1?'':' disabled'}>↓</button><input type="checkbox" class="on" ${c.on?'checked':''} title="Include in highlights and the cast sheet" aria-label="Include"><input type="color" class="col" value="${c.color}" aria-label="Color"><input class="nm" value="${scE(c.name)}" aria-label="Name" spellcheck="false"><span class="mut inf">${c.n||0} scenes${c.sp?' · '+c.sp+' with dialogue':c.hasLines?'':' · no dialogue'}</span><button class="rmv" title="Remove from the list" aria-label="Remove">✕</button></div>`).join('')||'<p class="mut">No characters found yet.</p>';
+  const al=$('#scal');$('#scan').textContent=SC.amb.length;
+  al.innerHTML=SC.amb.slice(0,200).map((a,i)=>{
+    const m=a.m,sc=SC.scenes[a.sc],t=m.txt,s0=Math.max(0,m.i0-28),ctx=(s0?'…':'')+t.slice(s0,m.i1+28)+(m.i1+28<t.length?'…':'');
+    return`<div class="sca"><span class="mut">Scene ${scE(sc.num)}, p.${m.pi+1}:</span> <span class="ctx">${scE(ctx)}</span> <select data-i="${i}"><option value="?">Decide…</option>${m.cands.map(id=>`<option value="${scE(id)}">${scE((SC.chars.find(c=>c.id==id)||{name:id}).name)}</option>`).join('')}<option value="">Not a character</option></select></div>`;
+  }).join('')||'<p class="mut">Nothing needs deciding.</p>';
+  $('#scam').hidden=!SC.amb.length;
+  if($('#scgd').open)scGrid();
+}
+function scGrid(){
+  const ch=SC.chars.filter(c=>c.on),g=$('#scgrid');
+  const nm=new Map(SC.chars.map(c=>[c.id,c.name]));
+  let h='<table class="scg"><thead><tr><th class="l">Scene</th><th class="l">I/E</th><th class="l">D/N</th>'+ch.map(c=>`<th><span style="background:${c.color}"></span><i>${scE(c.name)}</i></th>`).join('')+'</tr></thead><tbody>';
+  for(const s of SC.scenes){
+    const sp=[...s.sp].filter(k=>nm.has(k)).map(k=>nm.get(k)),al=[...s.pr].filter(k=>!s.sp.has(k)&&nm.has(k)).map(k=>nm.get(k));
+    const tip=`Scene ${s.num}${s.om?' (omitted)':''}\n${s.head||''}\nPage ${s.pi+1}`+(sp.length?'\nSpeaks: '+sp.join(', '):'')+(al.length?'\nAlso in scene: '+al.join(', '):'');
+    h+=`<tr${s.om?' class="om"':''} title="${scE(tip)}"><td class="l"><b>${scE(s.num)}</b></td><td class="l">${scE(s.ie)}</td><td class="l">${scE(s.dn)}</td>`+ch.map(c=>s.pr.has(c.id)?`<td class="x${s.sp.has(c.id)?' s':''}" style="background:${c.color}" title="${scE(c.name)}: ${s.sp.has(c.id)?'has dialogue':'in the scene'}, scene ${scE(s.num)}">${s.sp.has(c.id)?'🔊':''}</td>`:'<td></td>').join('')+'</tr>';
+  }
+  g.innerHTML=h+'</tbody></table>';
+}
+function scDirtyNow(){SC.dirty=true;touch();scRender()}
+function scOpen(){
+  const d=$('#scd');if(!d.open)d.showModal();scRender();
+  if(SC.sig!==scSig()){SC.sig=scSig();scScan()}
+}
+function scMove(id,to){
+  const i=SC.chars.findIndex(c=>c.id==id);if(i<0)return;
+  const [c]=SC.chars.splice(i,1);SC.chars.splice(Math.max(0,Math.min(SC.chars.length,to)),0,c);scDirtyNow();
+}
+function scAddSeed(txt){
+  txt=(txt||'').trim();if(txt.length<2)return false;
+  const up=txt.toUpperCase().replace(/\s+/g,' '),ex=SC.chars.find(c=>c.id==up||(c.cue||'').split(' ')[0]==up||(c.full||'')==up);
+  if(ex){ex.al=[...new Set([...(ex.al||[]),txt])];ex.on=true}
+  else{SC.seeds.push(txt);SC.rm=SC.rm.filter(x=>x!=up)}
+  if(SC.scenes.length)scResolve(SC.scenes,SC.cc||new Map());
+  const c=SC.chars.find(c=>c.id==up||(c.al||[]).includes(txt));
+  if(c&&!c.n&&!c.hasLines){SC.chars=SC.chars.filter(q=>q!==c);SC.seeds=SC.seeds.filter(x=>x!=txt);toast(`“${txt}” isn’t in the script.`);return false}
+  scDirtyNow();return true;
+}
+$('#scb').onclick=scOpen;
+$('#scx').onclick=()=>$('#scd').close();
+$('#scap').onclick=async()=>{const b=$('#scap');b.disabled=true;try{await scApply();toast('Colors applied to the script.')}finally{b.disabled=false}};
+$('#sccl').onclick=()=>{scClear();toast('Script marks removed (Undo brings them back).')};
+$('#sco1').onchange=e=>{SC.opt.dlg=e.target.checked;scDirtyNow()};
+$('#sco2').onchange=e=>{SC.opt.nm=e.target.checked;scDirtyNow()};
+$('#sco3').onchange=e=>{SC.opt.sq=e.target.checked;scDirtyNow()};
+$('#sco4').oninput=e=>{SC.opt.o=+e.target.value/100;SC.dirty=true;touch();$('#scap').classList.add('pri')};
+$('#scidx').onchange=e=>{SC.opt.idx=e.target.checked;touch()};
+$('#scgd').ontoggle=()=>{if($('#scgd').open)scGrid()};
+$('#scaddb').onclick=()=>{const i=$('#scadd');if(scAddSeed(i.value))i.value=''};
+$('#scadd').onkeydown=e=>{if(e.key=='Enter'){e.preventDefault();$('#scaddb').click()}};
+$('#sct').addEventListener('click',e=>{
+  const r=e.target.closest('.scr');if(!r)return;const id=r.dataset.id,i=SC.chars.findIndex(c=>c.id==id);
+  if(e.target.closest('.up'))scMove(id,i-1);
+  else if(e.target.closest('.dn'))scMove(id,i+1);
+  else if(e.target.closest('.rmv')){SC.chars.splice(i,1);if(!SC.rm.includes(id))SC.rm.push(id);SC.seeds=SC.seeds.filter(x=>x.toUpperCase()!=id);scResolve(SC.scenes,SC.cc||new Map());scDirtyNow()}
+});
+$('#sct').addEventListener('input',e=>{
+  const r=e.target.closest('.scr');if(!r)return;const c=SC.chars.find(c=>c.id==r.dataset.id);if(!c)return;
+  if(e.target.classList.contains('on'))c.on=e.target.checked;
+  else if(e.target.classList.contains('col'))c.color=e.target.value;
+  else if(e.target.classList.contains('nm')){c.name=e.target.value;c.ren=true}
+  SC.dirty=true;touch();$('#scap').classList.add('pri');$('#scs').textContent=$('#scs').textContent.replace(/ Changes below.*$/,'')+' Changes below are not on the script yet. Press Apply.';
+  if($('#scgd').open&&!e.target.classList.contains('nm'))scGrid();
+});
+// drag the grip to reorder
+{let dragId=null;const box=$('#sct');
+  box.addEventListener('pointerdown',e=>{const g=e.target.closest('.grip');if(g)g.closest('.scr').draggable=true});
+  box.addEventListener('dragstart',e=>{const r=e.target.closest('.scr');if(!r)return;dragId=r.dataset.id;e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',dragId)}catch(x){}});
+  box.addEventListener('dragover',e=>{if(!dragId)return;e.preventDefault();const r=e.target.closest('.scr');box.querySelectorAll('.over').forEach(x=>x.classList.remove('over'));if(r)r.classList.add('over')});
+  box.addEventListener('drop',e=>{if(!dragId)return;e.preventDefault();const r=e.target.closest('.scr');if(r&&r.dataset.id!=dragId){const to=SC.chars.findIndex(c=>c.id==r.dataset.id);scMove(dragId,to)}dragId=null});
+  box.addEventListener('dragend',()=>{dragId=null;box.querySelectorAll('.scr').forEach(x=>{x.draggable=false;x.classList.remove('over')})});
+}
+$('#scal').addEventListener('change',e=>{
+  const s=e.target.closest('select');if(!s||s.value=='?')return;
+  const a=SC.amb[+s.dataset.i];if(!a)return;
+  SC.dec[a.m.sk]=s.value;scResolve(SC.scenes,SC.cc||new Map());scDirtyNow();
+});
+async function scExport(kind){
+  const btn=$(kind=='all'?'#scex1':'#scex2'),old=btn.textContent,base=fname.replace(/-edited\.pdf$|\.pdf$/i,''),name=base+(kind=='all'?'-script-marked.pdf':'-cast-sheet.pdf');
+  let h=null;
+  if(window.showSaveFilePicker&&!matchMedia('(pointer:coarse)').matches){
+    try{h=await showSaveFilePicker({suggestedName:name,types:[{description:'PDF',accept:{'application/pdf':['.pdf']}}]})}
+    catch(e){if(e.name==='AbortError')return}
+  }
+  btn.disabled=true;btn.textContent='Working…';
+  try{
+    let bytes;
+    if(kind=='all'){await scApply();bytes=await buildPdf({cast:true})}
+    else bytes=await scCastPdf();
+    const blob=new Blob([bytes],{type:'application/pdf'});
+    if(h){const w=await h.createWritable();await w.write(blob);await w.close();toast('Saved.');return}
+    await shareFile(blob,name);
+  }catch(err){alert('Could not export: '+err.message)}
+  finally{btn.disabled=false;btn.textContent=old}
+}
+$('#scex1').onclick=()=>scExport('all');
+$('#scex2').onclick=()=>scExport('cast');
+$('#fmc').onclick=()=>{const q=$('#fq').value.trim();if(!q)return;if(!SC.is){toast('Script mode needs a screenplay.');return}if(scAddSeed(q)){scOpen();toast(`Added “${q}” as a character.`)}};
 
 // ---- Phone: share sheet, reminders, install, offline ----
 var nagT=Date.now();
