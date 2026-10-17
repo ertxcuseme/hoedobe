@@ -1,5 +1,5 @@
-// Hoedobe offline helper. Keeps a copy of the app and its libraries so it opens with no signal.
-const V = 'hoedobe-v7';
+// TL;DR.pdf offline helper. Keeps a copy of the app and its libraries so it opens with no signal.
+const V = 'tldr-v11';   // bump with the app version
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-32.png', './favicon.ico', './icon-512.png', './apple-touch-icon.png'];
 const LIBS = [
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
@@ -24,14 +24,17 @@ self.addEventListener('fetch', e => {
     e.respondWith(caches.match(r.url).then(m => m || fetch(r).then(res => { const c = res.clone(); caches.open(V).then(ca => ca.put(r.url, c)); return res; })));
     return;
   }
-  // The app itself: show the saved copy right away, refresh it in the background for next time.
+  // The app itself: ask the network first so a new upload shows up right away; fall back to the saved copy when offline.
   e.respondWith(caches.open(V).then(async ca => {
-    const hit = await ca.match(r, { ignoreSearch: true });
-    const net = fetch(r).then(res => { if (res.ok) ca.put(r, res.clone()); return res; }).catch(() => null);
-    if (hit) { e.waitUntil(net); return hit; }
-    const res = await net;
-    if (res) return res;
-    if (r.mode === 'navigate') { const idx = await ca.match('./index.html'); if (idx) return idx; }
-    return new Response('Offline', { status: 503 });
+    try {
+      const res = await fetch(r, { cache: 'no-cache' });
+      if (res.ok) ca.put(r, res.clone());
+      return res;
+    } catch (_) {
+      const hit = await ca.match(r, { ignoreSearch: true });
+      if (hit) return hit;
+      if (r.mode === 'navigate') { const idx = await ca.match('./index.html'); if (idx) return idx; }
+      return new Response('Offline', { status: 503 });
+    }
   }));
 });

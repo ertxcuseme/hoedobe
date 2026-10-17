@@ -6,14 +6,14 @@
 <meta name="theme-color" content="#262d3d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Hoedobe">
+<meta name="apple-mobile-web-app-title" content="TL;DR.pdf">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=4">
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png?v=4">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=4">
 <link rel="shortcut icon" href="favicon.ico?v=4">
-<title>Hoedobe</title>
+<title>TL;DR.pdf</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
@@ -218,7 +218,9 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
   body:not(.phone){grid-template-rows:1fr;padding-bottom:calc(var(--bar) + env(safe-area-inset-bottom,0px))}
   body:not(.phone)>header{position:fixed;left:0;right:0;bottom:0;z-index:25;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);border-bottom:0;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
   header>*{flex:none;order:20}
-  header h1,header .sep,header #ver{display:none}
+  header h1,header .sep{display:none}
+  header #ver{position:fixed;top:calc(3px + env(safe-area-inset-top,0px));right:14px;z-index:30;margin:0;padding:1px 7px;border-radius:8px;background:#000a;color:#fff;font-size:11px;pointer-events:none}
+  header #ver::before{content:'TL;DR.pdf '}
   header [data-tool]{order:1}
   header #cbtn{order:2}header #undo{order:3}header #redo{order:4}header #save{order:5}header #copy{order:6}
   header label[for=f]{order:7}header label[for=f2]{order:8}header #fbtn{order:9}header #rvb{order:10}
@@ -235,7 +237,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
 </head>
 <body class="tool-select">
 <header>
-  <h1>Hoedobe</h1><span id="ver" title="Version of this page. If it doesn't match the newest file name, reload or re-upload."></span>
+  <h1>TL;DR.pdf</h1><span id="ver" title="Version of this page. If it doesn't match the newest file name, reload or re-upload."></span>
   <label class="b pri" for="f">Open PDF</label>
   <label class="b narrow-only" for="f2">Add pages</label>
   <input type="file" id="f" accept="application/pdf" hidden>
@@ -268,7 +270,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
   <button id="zi" title="Zoom in" aria-label="Zoom in">+</button>
   <span id="hspace"></span>
   <button id="flat" title="Bake everything into a plain PDF: fields and edits become fixed, no undo data. Doesn't affect autosaves.">Flatten &amp; export</button>
-  <button id="inst" hidden title="Install Hoedobe as an app so it opens on its own and works offline">Install app</button>
+  <button id="inst" hidden title="Install TL;DR.pdf as an app so it opens on its own and works offline">Install app</button>
   <button id="copy" hidden title="Send a copy to Files, Mail, AirDrop and so on">Save a copy</button>
   <button id="asb" title="Autosave settings">Autosave: on</button>
   <button id="save">Save PDF</button>
@@ -300,12 +302,12 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
 </div>
 <dialog id="rs">
   <h2>Restore your edits?</h2>
-  <p>This file was autosaved by Hoedobe. It still has your edits, your undo history, and the original pages underneath.</p>
+  <p>This file was autosaved by TL;DR.pdf. It still has your edits, your undo history, and the original pages underneath.</p>
   <div class="row"><button id="rsp">Open as a plain PDF</button><button id="rsy" class="pri" style="margin-left:auto" autofocus>Restore edits</button></div>
 </dialog>
 <dialog id="as">
   <h2>Autosave</h2>
-  <p>Hoedobe keeps a draft of your work inside this browser while you edit, so a crash, power cut or closed tab doesn't lose it. When you open Hoedobe again, it offers to restore.</p>
+  <p>TL;DR.pdf keeps a draft of your work inside this browser while you edit, so a crash, power cut or closed tab doesn't lose it. When you open TL;DR.pdf again, it offers to restore.</p>
   <div id="asf">
     <p>On Chrome or Edge on a computer, it can also keep rolling backup files in a folder you choose. Each file is a normal PDF that also remembers your edits, so reopening one lets you keep editing and undo.</p>
     <p class="mut" style="font-size:12px">Files are named like <code>26Y10M16T2026-Medium.pdf</code>. It keeps up to 10 per PDF per day: the newest, the one before it, then older ones about 5 minutes apart, reaching back about an hour.</p>
@@ -358,7 +360,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
   <div class="scopts"><label><input type="checkbox" id="sco1"> Highlight dialogue</label><label><input type="checkbox" id="sco2"> Highlight names in the action</label><label><input type="checkbox" id="sco3"> Squares at scene headings</label><label title="Wherever one of these highlights covers black script text, that text is redrawn white. Nothing else changes, and the colors stay at full strength."><input type="checkbox" id="sco4"> Turn script text white under highlights</label></div>
   <p class="mut" style="font-size:12px;margin:4px 0">Drag a row by the dots (or use the arrows) to set the order. The same order is used for the squares and the cast sheet columns.</p>
   <div id="sct"></div>
-  <div class="row"><input id="scadd" placeholder="Add a name Hoedobe missed" aria-label="Add a character name" autocomplete="off"><button id="scaddb">Add character</button></div>
+  <div class="row"><input id="scadd" placeholder="Add a name the app missed" aria-label="Add a character name" autocomplete="off"><button id="scaddb">Add character</button></div>
   <details id="scam"><summary>Needs your decision (<span id="scan">0</span>)</summary><p class="mut" style="font-size:12px">A first name in the action that fits more than one character, and nobody in the scene settles it.</p><div id="scal"></div></details>
   <details id="scgd"><summary>Cast sheet preview (hover a scene for its details)</summary><div id="scgrid"></div></details>
   <label class="feel" style="margin-top:8px"><input type="checkbox" id="scidx" style="flex:none"> Add scene index pages (full headings and who is in each) to exports</label>
@@ -376,7 +378,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
   <div class="row"><button id="ocx">Close</button><button id="ocg" class="pri" style="margin-left:auto">Start</button></div></dialog>
 <div id="nag" hidden role="status"><span id="nagt">You have changes that aren't saved outside this browser.</span><button id="nags" class="pri"></button><button id="nagl">Later</button></div>
 <dialog id="sh"><h2>Your copy is ready</h2><p class="mut">Tap the button to choose where it goes.</p><div class="row" style="justify-content:center"><button id="shg" class="pri">Share / Save…</button><button id="shx">Cancel</button></div></dialog>
-<dialog id="ins"><h2>Install Hoedobe</h2><div id="insb"></div><div class="row" style="justify-content:center"><button id="insx" class="pri">Got it</button></div></dialog>
+<dialog id="ins"><h2>Install TL;DR.pdf</h2><div id="insb"></div><div class="row" style="justify-content:center"><button id="insx" class="pri">Got it</button></div></dialog>
 <div id="ph">
   <p id="pt">Sign below. Turn your phone sideways for more room.</p>
   <canvas id="pc" width="1840" height="920"></canvas>
@@ -391,7 +393,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
 </div>
 <script>
 const $=s=>document.querySelector(s);
-const APP_V=9;   // bump with every export; shown next to the title and used in the delivered folder name
+const APP_V=11;   // bump with every export; shown next to the title and used in the delivered folder name
 $('#ver').textContent='V'+String(APP_V).padStart(2,'0');
 const V=$('#view'),T=$('#thumbs');
 let docs=[],pages=[],tool='select',scale=1.3,sel=null,hist=[],fname='edited.pdf',drag=null,from=null;
@@ -1643,8 +1645,8 @@ async function buildPdf(opts={}){
     if(opts.cast)await scDrawCast(out,font);
     if(opts.embed){
       // The editable copy: the original PDFs and the edit data ride along inside the file.
-      for(let k=0;k<docs.length;k++)await out.attach(docs[k].bytes,'hoedobe-src-'+k+'.pdf',{mimeType:'application/pdf',description:'Original PDF (Hoedobe editable copy)'});
-      await out.attach(new TextEncoder().encode(JSON.stringify(packProject())),'hoedobe-project.json',{mimeType:'application/json',description:'Hoedobe edit data'});
+      for(let k=0;k<docs.length;k++)await out.attach(docs[k].bytes,'hoedobe-src-'+k+'.pdf',{mimeType:'application/pdf',description:'Original PDF (TL;DR.pdf editable copy)'});
+      await out.attach(new TextEncoder().encode(JSON.stringify(packProject())),'hoedobe-project.json',{mimeType:'application/json',description:'TL;DR.pdf edit data'});
     }
     return await out.save();
   }

@@ -1,6 +1,6 @@
 {
-  "name": "Hoedobe",
-  "short_name": "Hoedobe",
+  "name": "TL;DR.pdf",
+  "short_name": "TL;DR.pdf",
   "description": "PDF editor: fill, sign, highlight, annotate.",
   "start_url": "./",
   "scope": "./",
