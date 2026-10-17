@@ -82,6 +82,35 @@ body.phone #ph{position:fixed;inset:0;display:flex;flex-direction:column;align-i
 #qr[hidden]{display:none}
 #qimg svg{display:block;border-radius:6px}
 #qurl{display:block;word-break:break-all;font-size:11px;color:var(--mute);margin-top:6px}
+#fb{position:fixed;top:58px;right:22px;z-index:20;display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 8px;box-shadow:0 4px 18px #0008}
+#fb[hidden]{display:none}
+#fq{width:190px;background:#1d2332;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font:inherit}
+#fc{color:var(--mute);font-size:12px;min-width:74px}
+#fb button{padding:4px 9px}
+.hl{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:multiply}
+.sw{width:34px;height:28px;padding:3px}
+#csw{display:block;width:100%;height:100%;border-radius:3px;border:1px solid #0007}
+header input[type=range]{width:100px;accent-color:var(--acc)}
+header input[type=range]:disabled{opacity:.4}
+header output{min-width:34px;color:var(--text);font-size:12px}
+#cp{position:fixed;z-index:30;width:268px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;box-shadow:0 8px 28px #000a}
+#cp[hidden]{display:none}
+.cprev{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+#cpsw{width:38px;height:30px;border-radius:6px;border:1px solid #0007;flex:none}
+#chex{flex:1;min-width:0;background:#1d2332;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font:13px ui-monospace,Consolas,monospace}
+.cs{display:grid;grid-template-columns:14px 1fr 38px;align-items:center;gap:8px;margin:7px 0;color:var(--mute);font-size:12px}
+.cs input{width:100%;height:12px;margin:0;-webkit-appearance:none;appearance:none;border-radius:6px;background:#444;border:1px solid #0007}
+.cs input::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #222;box-shadow:0 0 0 1px #fff9}
+.cs input::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #222}
+.cs output{text-align:right}
+.cplab{display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px;color:var(--mute);font-size:12px}
+.cplab button{padding:1px 8px;font-size:12px}
+#cedit.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.cg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.cg button{height:30px;padding:0;border-radius:6px;border:1px solid #0007}
+.cg button.empty{background:transparent;border:1px dashed var(--line);cursor:default}
+.cg button.cur{outline:2px solid var(--acc);outline-offset:1px}
+.cg.edit button:not(.empty){outline:2px dashed var(--acc);outline-offset:1px}
 @media(max-width:640px){main{grid-template-columns:1fr}aside{display:none}}
 </style>
 </head>
@@ -93,16 +122,18 @@ body.phone #ph{position:fixed;inset:0;display:flex;flex-direction:column;align-i
   <input type="file" id="f" accept="application/pdf" hidden>
   <input type="file" id="f2" accept="application/pdf" multiple hidden>
   <span class="sep"></span>
-  <button class="b on" data-tool="select" title="Select / move (V)">Select</button>
-  <button class="b" data-tool="text" title="Text (T)">Text</button>
-  <button class="b" data-tool="draw" title="Draw (D)">Draw</button>
-  <button class="b" data-tool="highlight" title="Highlight (H)">Highlight</button>
-  <button class="b" data-tool="whiteout" title="Whiteout (W)">Whiteout</button>
-  <button class="b" data-tool="sign" title="Signature (S)">Sign</button>
-  <input type="color" id="col" value="#111111" title="Color" aria-label="Color">
-  <label class="f">Text <input type="number" id="fs" value="14" min="4" max="120"></label>
-  <label class="f">Pen <input type="number" id="pw" value="2" min="1" max="30"></label>
+  <button class="b on" data-tool="select" title="Select / move (V or F1)">Select</button>
+  <button class="b" data-tool="text" title="Text (T or F2)">Text</button>
+  <button class="b" data-tool="draw" title="Draw (D or F3)">Draw</button>
+  <button class="b" data-tool="highlight" title="Highlight (H or F4)">Highlight</button>
+  <button class="b" data-tool="whiteout" title="Whiteout (W or F5)">Whiteout</button>
+  <button class="b" data-tool="sign" title="Signature (S or F6)">Sign</button>
+  <button id="cbtn" class="sw" title="Color" aria-label="Color" aria-haspopup="dialog" aria-expanded="false"><span id="csw"></span></button>
+  <label class="f" title="Font size (Up / Down arrow keys)">Text <input type="number" id="fs" value="14" min="4" max="120"></label>
+  <label class="f" title="Pen size (Left / Right arrow keys)">Pen <input type="number" id="pw" value="2" min="1" max="30"></label>
+  <label class="f" title="Opacity of the active tool, or of the selected item">Opacity <input type="range" id="op" min="5" max="100" value="100" aria-label="Opacity"><output id="opo" for="op">100%</output></label>
   <span class="sep"></span>
+  <button id="fbtn" title="Find text in the PDF (Ctrl+F)">Find</button>
   <button id="undo" title="Undo (Ctrl+Z)">Undo</button>
   <button id="zo" title="Zoom out" aria-label="Zoom out">−</button>
   <span id="z">130%</span>
@@ -114,6 +145,24 @@ body.phone #ph{position:fixed;inset:0;display:flex;flex-direction:column;align-i
   <div id="view"></div>
   <div id="empty"><p><strong>Drop a PDF here</strong></p><p>or choose Open PDF. Files stay in your browser.</p></div>
 </main>
+<div id="fb" hidden>
+  <input id="fq" type="search" placeholder="Find in PDF" aria-label="Find in PDF" autocomplete="off">
+  <span id="fc" aria-live="polite"></span>
+  <button id="fp" title="Previous (Shift+Enter)" aria-label="Previous match">↑</button>
+  <button id="fn" title="Next (Enter)" aria-label="Next match">↓</button>
+  <button id="fh" title="Turn every match into a highlight">Highlight all</button>
+  <button id="fx" title="Close (Esc)" aria-label="Close search">✕</button>
+</div>
+<div id="cp" hidden role="dialog" aria-label="Color picker">
+  <div class="cprev"><span id="cpsw"></span><input id="chex" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Hex color"><button id="ceye" type="button" title="Pick a color from anywhere on screen" hidden>Pick</button></div>
+  <label class="cs" title="Hue"><span>H</span><input type="range" id="ch" min="0" max="360" aria-label="Hue"><output id="cho"></output></label>
+  <label class="cs" title="Saturation"><span>S</span><input type="range" id="cs" min="0" max="100" aria-label="Saturation"><output id="cso"></output></label>
+  <label class="cs" title="Lightness"><span>L</span><input type="range" id="cl" min="0" max="100" aria-label="Lightness"><output id="clo"></output></label>
+  <div class="cplab"><span id="cpt">Saved</span><button id="cedit" type="button" aria-pressed="false" title="Click this, then click a box to save the current color into it. Shift-click or right-click a box also works.">Save color…</button></div>
+  <div class="cg" id="cpre"></div>
+  <div class="cplab"><span>Recent</span></div>
+  <div class="cg" id="crec"></div>
+</div>
 <dialog id="sg">
   <h2>Signatures</h2>
   <div id="sl"></div>
@@ -202,14 +251,14 @@ async function paint(el){
 }
 
 function build(){
-  sel=null;V.innerHTML=T.innerHTML='';
+  sel=null;hits=[];cur=-1;V.innerHTML=T.innerHTML='';
   $('#empty').hidden=pages.length>0;
   $('#z').textContent=Math.round(scale*100/1.3*1.3)+'%';
   pages.forEach((p,i)=>{
     const [W,H]=dims(p);
     const el=document.createElement('div');
     el.className='pg';el.dataset.i=i;el.style.width=W*scale+'px';el.style.height=H*scale+'px';
-    el.innerHTML='<canvas></canvas><div class="fm"></div><svg class="ov"></svg><div class="tx"></div>';
+    el.innerHTML='<canvas></canvas><div class="fm"></div><svg class="ov"></svg><svg class="hl"></svg><div class="tx"></div>';
     V.append(el);io.observe(el);
     const th=document.createElement('div');
     th.className='th';th.draggable=true;th.dataset.i=i;th.style.height=H*110/W+'px';
@@ -217,32 +266,50 @@ function build(){
     T.append(th);io.observe(th);
   });
   pages.forEach((_,i)=>overlay(i));
+  if(fOpen)runFind(false);
+  syncUI();
 }
 
 function overlay(i){
   const p=pages[i],el=V.children[i];if(!el)return;
-  const [W,H]=dims(p),svg=el.querySelector('.ov'),tx=el.querySelector('.tx');
-  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const [W,H]=dims(p),svg=el.querySelector('svg.ov'),hl=el.querySelector('svg.hl'),tx=el.querySelector('.tx');
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);hl.setAttribute('viewBox',`0 0 ${W} ${H}`);
   const isSel=k=>sel&&sel[0]==i&&sel[1]==k?' sel':'';
-  let s='';
+  const box=(x,y,w,h)=>{const [x1,y1]=fwd(p,x,y),[x2,y2]=fwd(p,x+w,y+h);return[Math.min(x1,x2),Math.min(y1,y2),Math.abs(x2-x1),Math.abs(y2-y1)]};
+  // Highlights live in their own multiply-blended layer: dark text stays dark, same-color
+  // highlights merge into one shape (no double darkening), different colors mix.
+  let s='',m='';const groups={};
+  if(fOpen)hits.forEach((h,k)=>{
+    if(h.pi!=i)return;
+    h.rects.forEach(r=>{
+      const [x,y,w,hh]=box(r.x,r.y,r.w,r.h);
+      m+=`<rect x="${x}" y="${y}" width="${w}" height="${hh}" fill="${k==cur?'#ff8a00':'#ffd400'}" fill-opacity="${k==cur?.85:.75}"/>`;
+    });
+  });
   p.ann.forEach((a,k)=>{
     if(a.t=='rect'){
-      const [x1,y1]=fwd(p,a.x,a.y),[x2,y2]=fwd(p,a.x+a.w,a.y+a.h);
-      s+=`<rect data-k="${k}" class="a${isSel(k)}" x="${Math.min(x1,x2)}" y="${Math.min(y1,y2)}" width="${Math.abs(x2-x1)}" height="${Math.abs(y2-y1)}" fill="${a.c}" fill-opacity="${a.hl?.4:1}"/>`;
+      const [x,y,w,h]=box(a.x,a.y,a.w,a.h);
+      if(a.hl){
+        const key=a.c+'|'+oa(a),g=groups[key]||(groups[key]={c:a.c,o:oa(a),d:''});
+        g.d+=`M${x} ${y}h${w}v${h}h${-w}z`;
+        s+=`<rect data-k="${k}" class="a${isSel(k)}" x="${x}" y="${y}" width="${w}" height="${h}" fill="transparent"${isSel(k)?' stroke="#5b8cff" stroke-dasharray="4"':''}/>`;
+      }else s+=`<rect data-k="${k}" class="a${isSel(k)}" x="${x}" y="${y}" width="${w}" height="${h}" fill="${a.c}"/>`;
     }else if(a.t=='img'&&srcs[a.sid]){
       const [u,v]=fwd(p,a.x,a.y);
-      s+=`<image data-k="${k}" class="a${isSel(k)}" href="${srcs[a.sid]}" x="${u}" y="${v}" width="${a.w}" height="${a.h}" preserveAspectRatio="none"/>`;
+      s+=`<image data-k="${k}" class="a${isSel(k)}" href="${srcs[a.sid]}" x="${u}" y="${v}" width="${a.w}" height="${a.h}" opacity="${oa(a)}" preserveAspectRatio="none"/>`;
       if(isSel(k))s+=`<rect x="${u}" y="${v}" width="${a.w}" height="${a.h}" fill="none" stroke="#5b8cff" stroke-dasharray="4" pointer-events="none"/><circle class="rs" data-k="${k}" cx="${u+a.w}" cy="${v+a.h}" r="7" fill="#5b8cff"/>`;
     }else if(a.t=='path'){
-      s+=`<polyline data-k="${k}" class="a${isSel(k)}" fill="none" stroke="${a.c}" stroke-width="${a.s}" stroke-linecap="round" stroke-linejoin="round" points="${a.p.map(q=>fwd(p,q[0],q[1]).join(',')).join(' ')}"/>`;
+      s+=`<polyline data-k="${k}" class="a${isSel(k)}" fill="none" stroke="${a.c}" stroke-opacity="${oa(a)}" stroke-width="${a.s}" stroke-linecap="round" stroke-linejoin="round" points="${a.p.map(q=>fwd(p,q[0],q[1]).join(',')).join(' ')}"/>`;
     }
   });
-  svg.innerHTML=s;tx.innerHTML='';
+  svg.innerHTML=s;
+  hl.innerHTML=m+Object.values(groups).map(g=>`<path d="${g.d}" fill="${g.c}" fill-opacity="${g.o}"/>`).join('');
+  tx.innerHTML='';
   p.ann.forEach((a,k)=>{
     if(a.t!='text')return;
     const [x,y]=fwd(p,a.x,a.y),d=document.createElement('div');
     d.className='t'+isSel(k);d.dataset.k=k;d.textContent=a.text;
-    d.style.cssText=`left:${x*scale}px;top:${y*scale}px;font-size:${a.s*scale}px;color:${a.c}`;
+    d.style.cssText=`left:${x*scale}px;top:${y*scale}px;font-size:${a.s*scale}px;color:${a.c};opacity:${oa(a)}`;
     tx.append(d);
   });
 }
@@ -256,7 +323,7 @@ function edit(i,k){
     const a=pages[i]&&pages[i].ann[k];if(!a)return;
     const v=d.innerText.replace(/\n+$/,'');
     if(v!==a.text){snap();a.text=v}
-    if(!a.text){a.t='x';pages[i].ann.splice(k,1);sel=null}
+    if(!a.text){a.t='x';pages[i].ann.splice(k,1);sel=null;syncUI()}
     overlay(i);
   };
 }
@@ -264,17 +331,147 @@ function edit(i,k){
 function setTool(t){
   tool=t;document.body.className='tool-'+t;
   document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('on',b.dataset.tool==t));
-  if(tc[t])$('#col').value=tc[t];
+  if(COLORED.includes(t))colTool=t;
+  syncUI();
 }
 document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>b.dataset.tool=='sign'?openSig():setTool(b.dataset.tool));
-$('#col').oninput=e=>{if(tc[tool])tc[tool]=e.target.value};
 
+// ---- Colors and opacity ----
+const COLORED=['text','draw','highlight','whiteout'],OPAQ=['text','draw','sign','highlight'];
+const opv={text:1,draw:1,sign:1,highlight:.8};
+const oa=a=>a.o==null?1:a.o;
+let colTool='text',cSnap=false,oSnap=false,editing=false;
+const HEX=/^#[0-9a-f]{6}$/i,HUEBAR='linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)';
+const DEF=['#111111','#e53935','#fb8c00','#ffe14d','#43a047','#00acc1','#1a4fff','#8e24aa','#ec407a','#9e9e9e'];
+let presets=DEF.slice(),recents=[];
+const lget=k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}};
+const lset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+{
+  const a=lget('hoedobe.presets'),b=lget('hoedobe.recents');
+  if(Array.isArray(a)&&a.length==10&&a.every(x=>HEX.test(x)))presets=a;
+  if(Array.isArray(b))recents=b.filter(x=>HEX.test(x)).slice(0,5);
+}
+function hexHsl(h){
+  const r=parseInt(h.slice(1,3),16)/255,g=parseInt(h.slice(3,5),16)/255,b=parseInt(h.slice(5,7),16)/255;
+  const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;let H=0,S=0;
+  if(d){S=d/(1-Math.abs(2*l-1));H=(mx==r?(g-b)/d+(g<b?6:0):mx==g?(b-r)/d+2:(r-g)/d+4)*60}
+  return[Math.round(H)%360,Math.round(S*100),Math.round(l*100)];
+}
+function hslHex(H,S,L){
+  S/=100;L/=100;
+  const k=n=>(n+H/30)%12,a=S*Math.min(L,1-L),f=n=>L-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1));
+  return '#'+[f(0),f(8),f(4)].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');
+}
+const selAnn=()=>sel&&pages[sel[0]]?pages[sel[0]].ann[sel[1]]||null:null;
+const curColor=()=>{const a=tool=='select'?selAnn():null;return(a&&a.c)||tc[COLORED.includes(tool)?tool:colTool]};
+function opTarget(){
+  const a=tool=='select'?selAnn():null;
+  if(a)return(a.t=='text'||a.t=='path'||a.t=='img'||(a.t=='rect'&&a.hl))?{a}:null;
+  return OPAQ.includes(tool)?{tool}:null;
+}
+function setColor(h){
+  h=h.toLowerCase();
+  const a=tool=='select'?selAnn():null;
+  if(a&&a.c){if(!cSnap){snap();cSnap=true}a.c=h;overlay(sel[0])}
+  else tc[COLORED.includes(tool)?tool:colTool]=h;
+}
+function noteUse(c){
+  if(!HEX.test(c||''))return;
+  c=c.toLowerCase();recents=[c,...recents.filter(x=>x!=c)].slice(0,5);lset('hoedobe.recents',recents);
+  if(!$('#cp').hidden)renderSwatches();
+}
+function markCur(h){document.querySelectorAll('#cp .cg button[data-c]').forEach(b=>b.classList.toggle('cur',b.dataset.c==h))}
+function paintColorUI(h,src){
+  $('#csw').style.background=h;$('#cpsw').style.background=h;
+  if(src!='hex')$('#chex').value=h;
+  const [H,S,L]=src=='hsl'?[+$('#ch').value,+$('#cs').value,+$('#cl').value]:hexHsl(h);
+  if(src!='hsl'){$('#ch').value=H;$('#cs').value=S;$('#cl').value=L}
+  $('#cho').textContent=H+'°';$('#cso').textContent=S+'%';$('#clo').textContent=L+'%';
+  $('#ch').style.background=HUEBAR;
+  $('#cs').style.background=`linear-gradient(90deg,hsl(${H},0%,${L}%),hsl(${H},100%,${L}%))`;
+  $('#cl').style.background=`linear-gradient(90deg,#000,hsl(${H},${S}%,50%),#fff)`;
+  markCur(h);
+}
+function syncUI(){
+  const h=curColor();$('#csw').style.background=h;
+  const t=opTarget(),r=$('#op'),v=t?Math.round((t.a?oa(t.a):opv[t.tool])*100):100;
+  r.disabled=!t;r.value=v;$('#opo').textContent=t?v+'%':'–';
+  if(!$('#cp').hidden)paintColorUI(h);
+}
+function renderSwatches(){
+  const mk=(c,i,kind)=>c?`<button type="button" style="background:${c}" data-c="${c}" data-i="${i}" title="${c}" aria-label="${kind} color ${c}"></button>`:`<button type="button" class="empty" disabled aria-hidden="true"></button>`;
+  $('#cpre').innerHTML=presets.map((c,i)=>mk(c,i,'Saved')).join('');
+  $('#crec').innerHTML=Array.from({length:5},(_,i)=>mk(recents[i],i,'Recent')).join('');
+  markCur(curColor());
+}
+function setEditing(v){
+  editing=v;$('#cedit').classList.toggle('on',v);$('#cedit').setAttribute('aria-pressed',v);
+  $('#cpt').textContent=v?'Click a box to save here':'Saved';$('#cpre').classList.toggle('edit',v);
+}
+function savePreset(i){presets[i]=curColor();lset('hoedobe.presets',presets);setEditing(false);renderSwatches()}
+function applyColor(c){setColor(c);cSnap=false;paintColorUI(c)}
+function openCP(){
+  const cp=$('#cp'),b=$('#cbtn').getBoundingClientRect();
+  cp.hidden=false;cp.style.top=(b.bottom+6)+'px';
+  cp.style.left=Math.max(8,Math.min(b.left,innerWidth-cp.offsetWidth-8))+'px';
+  $('#cbtn').setAttribute('aria-expanded','true');
+  renderSwatches();paintColorUI(curColor());
+}
+function closeCP(){$('#cp').hidden=true;$('#cbtn').setAttribute('aria-expanded','false');cSnap=false;setEditing(false)}
+$('#cbtn').onclick=()=>$('#cp').hidden?openCP():closeCP();
+document.addEventListener('pointerdown',e=>{if(!$('#cp').hidden&&!e.target.closest('#cp,#cbtn'))closeCP()});
+addEventListener('resize',()=>{if(!$('#cp').hidden)closeCP()});
+['ch','cs','cl'].forEach(id=>{
+  const r=$('#'+id);
+  r.oninput=()=>{const h=hslHex(+$('#ch').value,+$('#cs').value,+$('#cl').value);setColor(h);paintColorUI(h,'hsl')};
+  r.onchange=()=>{cSnap=false};
+});
+$('#chex').oninput=e=>{
+  let v=e.target.value.trim().replace(/^#?/,'#');
+  if(/^#[0-9a-f]{3}$/i.test(v))v='#'+v[1]+v[1]+v[2]+v[2]+v[3]+v[3];
+  if(HEX.test(v)){setColor(v);paintColorUI(v,'hex')}
+};
+$('#chex').onchange=()=>{cSnap=false;paintColorUI(curColor())};
+$('#cedit').onclick=()=>setEditing(!editing);
+$('#cpre').onclick=e=>{
+  const b=e.target.closest('button[data-c]');if(!b)return;
+  if(editing||e.shiftKey)savePreset(+b.dataset.i);else applyColor(b.dataset.c);
+};
+$('#cpre').oncontextmenu=e=>{const b=e.target.closest('button[data-c]');if(!b)return;e.preventDefault();savePreset(+b.dataset.i)};
+$('#crec').onclick=e=>{const b=e.target.closest('button[data-c]');if(b)applyColor(b.dataset.c)};
+if(window.EyeDropper){
+  $('#ceye').hidden=false;
+  $('#ceye').onclick=()=>new EyeDropper().open().then(r=>applyColor(r.sRGBHex)).catch(()=>{});
+}
+$('#op').oninput=e=>{
+  const v=e.target.value/100,t=opTarget();if(!t)return;
+  if(t.a){if(!oSnap){snap();oSnap=true}t.a.o=v;overlay(sel[0])}else opv[t.tool]=v;
+  $('#opo').textContent=e.target.value+'%';
+};
+$('#op').onchange=()=>{oSnap=false};
+// After dragging a slider with the mouse, hand the keyboard back so the arrow keys change sizes, not the slider.
+['op','ch','cs','cl'].forEach(id=>$('#'+id).addEventListener('pointerup',e=>{const t=e.target;setTimeout(()=>t.blur(),0)}));
+
+// Arrow keys: Up/Down = font size, Left/Right = pen size. With the Select tool and a text or pen item selected,
+// they resize that item; otherwise they change the Text / Pen boxes in the header.
+let aSnapT=0;
+function nudge(id,d,type){
+  const el=$('#'+id),lo=+el.min,hi=+el.max,a=tool=='select'?selAnn():null,clamp=n=>Math.min(hi,Math.max(lo,n));
+  if(a&&a.t==type){
+    if(Date.now()-aSnapT>700)snap();
+    aSnapT=Date.now();
+    a.s=clamp(a.s+d);el.value=a.s;overlay(sel[0]);
+  }else el.value=clamp((+el.value||lo)+d);
+}
+syncUI();
+
+const needsRe=a=>a&&(a.t=='img'||(a.t=='rect'&&a.hl));
 V.addEventListener('pointerdown',e=>{
   if(e.target.isContentEditable||e.button)return;
   const el=e.target.closest('.pg');if(!el)return;
   const i=+el.dataset.i,p=pages[i];
   const P=ev=>{const r=el.getBoundingClientRect();return inv(p,(ev.clientX-r.left)/scale,(ev.clientY-r.top)/scale)};
-  const [x,y]=P(e),c=$('#col').value;
+  const [x,y]=P(e),c=tc[tool];
   if(tool=='select'){
     const t=e.target.closest('.t,.a,.rs'),prev=sel;
     document.querySelectorAll('.sel').forEach(n=>n.classList.remove('sel'));
@@ -283,14 +480,15 @@ V.addEventListener('pointerdown',e=>{
       drag={i,k:+t.dataset.k,el,mode:'resize',ratio:a.h/a.w};
     }else if(t){
       t.classList.add('sel');sel=[i,+t.dataset.k];drag={i,k:sel[1],P,last:[x,y],mode:'move'};
-      if(p.ann[sel[1]].t=='img')overlay(i);
+      if(needsRe(p.ann[sel[1]]))overlay(i);
     }else sel=null;
-    if(prev&&(!sel||prev[0]!=sel[0]||prev[1]!=sel[1])){const q=pages[prev[0]];if(q&&q.ann[prev[1]]&&q.ann[prev[1]].t=='img')overlay(prev[0])}
+    if(prev&&(!sel||prev[0]!=sel[0]||prev[1]!=sel[1])){const q=pages[prev[0]];if(q&&needsRe(q.ann[prev[1]]))overlay(prev[0])}
+    syncUI();
   }else if(tool=='draw'){
-    snap();p.ann.push({t:'path',p:[[x,y],[x,y]],s:+$('#pw').value||2,c});
+    snap();noteUse(c);p.ann.push({t:'path',p:[[x,y],[x,y]],s:+$('#pw').value||2,c,o:opv.draw});
     drag={i,k:p.ann.length-1,P,mode:'draw'};overlay(i);
   }else if(tool=='highlight'||tool=='whiteout'){
-    snap();p.ann.push({t:'rect',x,y,w:0,h:0,c,hl:tool=='highlight'});
+    snap();if(tool=='highlight')noteUse(c);p.ann.push(tool=='highlight'?{t:'rect',x,y,w:0,h:0,c,hl:true,o:opv.highlight}:{t:'rect',x,y,w:0,h:0,c,hl:false});
     drag={i,k:p.ann.length-1,P,x0:x,y0:y,mode:'rect'};
   }
 });
@@ -327,11 +525,11 @@ V.addEventListener('click',e=>{
   if(tool=='sign'){
     const s=sigs.find(q=>q.id==curSig);if(!s){openSig();return}
     const w=150,h=w*s.h/s.w,[x,y]=inv(p,(e.clientX-r.left)/scale-w/2,(e.clientY-r.top)/scale-h/2);
-    snap();p.ann.push({t:'img',sid:s.id,x,y,w,h});
-    setTool('select');sel=[i,p.ann.length-1];overlay(i);return;
+    snap();p.ann.push({t:'img',sid:s.id,x,y,w,h,o:opv.sign});
+    setTool('select');sel=[i,p.ann.length-1];overlay(i);syncUI();return;
   }
   const [x,y]=inv(p,(e.clientX-r.left)/scale,(e.clientY-r.top)/scale);
-  snap();p.ann.push({t:'text',x,y,text:'',s:+$('#fs').value||14,c:$('#col').value});
+  snap();noteUse(tc.text);p.ann.push({t:'text',x,y,text:'',s:+$('#fs').value||14,c:tc.text,o:opv.text});
   overlay(i);edit(i,p.ann.length-1);
 });
 V.addEventListener('dblclick',e=>{
@@ -339,11 +537,27 @@ V.addEventListener('dblclick',e=>{
   if(t&&tool=='select')edit(+t.closest('.pg').dataset.i,+t.dataset.k);
 });
 addEventListener('keydown',e=>{
+  if(e.key=='Escape'&&!$('#cp').hidden){closeCP();return}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()=='f'&&pages.length){e.preventDefault();openFind();return}
+  const plain=!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!document.querySelector('dialog[open]');
+  const FK=plain&&{F1:'select',F2:'text',F3:'draw',F4:'highlight',F5:'whiteout',F6:'sign'}[e.key];
+  if(FK){
+    e.preventDefault();
+    if(e.target.isContentEditable)e.target.blur();
+    if(FK=='sign')openSig();else setTool(FK);
+    return;
+  }
   if(e.target.isContentEditable){if(e.key=='Escape')e.target.blur();return}
   if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()=='z'){e.preventDefault();undo();return}
+  if(plain&&pages.length&&/^Arrow(Up|Down|Left|Right)$/.test(e.key)){
+    e.preventDefault();
+    if(e.key=='ArrowUp'||e.key=='ArrowDown')nudge('fs',e.key=='ArrowUp'?1:-1,'text');
+    else nudge('pw',e.key=='ArrowRight'?1:-1,'path');
+    return;
+  }
   if((e.key=='Delete'||e.key=='Backspace')&&sel){
-    snap();const i=sel[0];pages[i].ann.splice(sel[1],1);sel=null;overlay(i);return;
+    snap();const i=sel[0];pages[i].ann.splice(sel[1],1);sel=null;overlay(i);syncUI();return;
   }
   if(e.key.toLowerCase()=='s'&&!e.ctrlKey&&!e.metaKey){openSig();return}
   const m={v:'select',t:'text',d:'draw',h:'highlight',w:'whiteout'}[e.key.toLowerCase()];
@@ -681,6 +895,83 @@ $('#sri').onchange=async e=>{
   e.target.value='';
 };
 
+// ---- Find text in the PDF (Ctrl+F) ----
+let hits=[],cur=-1,ftok=0,fOpen=false,fTimer;
+const tcache={};
+async function pageText(p){
+  const key=p.d+':'+p.n;if(tcache[key])return tcache[key];
+  const pg=await docs[p.d].pdf.getPage(p.n),tx=await pg.getTextContent(),vp=pg.getViewport({scale:1});
+  let str='';const items=[];
+  for(const it of tx.items){
+    if(typeof it.str!='string')continue;
+    const h=it.height||Math.abs(it.transform[3])||10,e=it.transform[4],f=it.transform[5];
+    const r=vp.convertToViewportRectangle([e,f-.22*h,e+it.width,f+.8*h]);
+    items.push({s:str.length,e:str.length+it.str.length,x:Math.min(r[0],r[2]),y:Math.min(r[1],r[3]),w:Math.abs(r[2]-r[0]),h:Math.abs(r[3]-r[1])});
+    str+=it.str+(it.hasEOL?'\n':'');
+  }
+  return tcache[key]={str:str.toLowerCase(),items};
+}
+async function runFind(jump){
+  const q=$('#fq').value.toLowerCase(),tok=++ftok;
+  hits=[];cur=-1;
+  if(!q){$('#fc').textContent='';pages.forEach((_,i)=>overlay(i));return}
+  $('#fc').textContent='Searching…';
+  let total=0;
+  for(let i=0;i<pages.length;i++){
+    const t=await pageText(pages[i]);if(tok!=ftok)return;
+    total+=t.str.length;
+    let from=0,ix;
+    while((ix=t.str.indexOf(q,from))>=0){
+      const end=ix+q.length,rects=[];
+      for(const it of t.items){
+        if(it.e<=ix)continue;if(it.s>=end)break;
+        const len=it.e-it.s;if(!len)continue;
+        const a=(Math.max(ix,it.s)-it.s)/len,b=(Math.min(end,it.e)-it.s)/len;
+        rects.push({x:it.x+it.w*a,y:it.y,w:it.w*(b-a),h:it.h});
+      }
+      if(rects.length)hits.push({pi:i,rects});
+      from=ix+Math.max(1,q.length);
+    }
+  }
+  if(tok!=ftok)return;
+  cur=hits.length?0:-1;
+  pages.forEach((_,i)=>overlay(i));
+  if(hits.length){$('#fc').textContent=`1 of ${hits.length}`;if(jump)goTo(0)}
+  else $('#fc').textContent=total?'No matches':'No text found';
+}
+function goTo(k){
+  const h=hits[k],p=pages[h.pi],el=V.children[h.pi];if(!el)return;
+  const [,vy]=fwd(p,h.rects[0].x,h.rects[0].y);
+  const top=V.scrollTop+el.getBoundingClientRect().top-V.getBoundingClientRect().top+vy*scale-V.clientHeight/3;
+  V.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+  $('#fc').textContent=`${k+1} of ${hits.length}`;
+}
+function step(d){
+  if(!hits.length)return;
+  const old=cur;cur=(cur+d+hits.length)%hits.length;
+  overlay(hits[old].pi);overlay(hits[cur].pi);goTo(cur);
+}
+function openFind(){
+  if(!pages.length)return;
+  fOpen=true;$('#fb').hidden=false;$('#fq').focus();$('#fq').select();
+  if($('#fq').value)runFind(true);
+}
+function closeFind(){fOpen=false;$('#fb').hidden=true;ftok++;hits=[];cur=-1;pages.forEach((_,i)=>overlay(i))}
+function hlAll(){
+  if(!hits.length)return;
+  snap();const c=tc.highlight,set=new Set();noteUse(c);
+  hits.forEach(h=>{set.add(h.pi);h.rects.forEach(r=>pages[h.pi].ann.push({t:'rect',x:r.x,y:r.y,w:r.w,h:r.h,c,hl:true,o:opv.highlight}))});
+  set.forEach(i=>overlay(i));
+  $('#fc').textContent=`Highlighted ${hits.length}`;
+}
+$('#fbtn').onclick=openFind;
+$('#fq').oninput=()=>{clearTimeout(fTimer);fTimer=setTimeout(()=>runFind(true),200)};
+$('#fq').onkeydown=e=>{
+  if(e.key=='Enter'){e.preventDefault();clearTimeout(fTimer);if(hits.length)step(e.shiftKey?-1:1);else runFind(true)}
+  else if(e.key=='Escape')closeFind();
+};
+$('#fn').onclick=()=>step(1);$('#fp').onclick=()=>step(-1);$('#fx').onclick=closeFind;$('#fh').onclick=hlAll;
+
 $('#undo').onclick=undo;
 $('#zi').onclick=()=>{scale=Math.min(3,scale+.2);build()};
 $('#zo').onclick=()=>{scale=Math.max(.5,scale-.2);build()};
@@ -690,7 +981,7 @@ async function save(){
   if(!pages.length)return;
   const btn=$('#save');btn.disabled=true;btn.textContent='Saving…';
   try{
-    const {PDFDocument,StandardFonts,rgb,degrees}=PDFLib;
+    const {PDFDocument,StandardFonts,rgb,degrees,BlendMode,setLineJoin,LineJoinStyle}=PDFLib;
     const out=await PDFDocument.create(),font=await out.embedFont(StandardFonts.Helvetica),src={},emb={};
     const col=h=>rgb(parseInt(h.slice(1,3),16)/255,parseInt(h.slice(3,5),16)/255,parseInt(h.slice(5,7),16)/255);
     for(const p of pages){
@@ -704,28 +995,38 @@ async function save(){
       const vp=pg.getViewport({scale:1,rotation:tot});
       if(nf)await flatten(p,pg,cp,vp,tot,font);
       const P=(x,y)=>{const [u,v]=fwd(p,x,y);return vp.convertToPdfPoint(u,v)};
+      const f3=n=>n.toFixed(3),pt=(x,y)=>{const q=P(x,y);return f3(q[0])+' '+f3(-q[1])};
+      // Layer order matches the editor: whiteout, pen and signatures, then highlights (multiply), then text.
+      cp.pushOperators(setLineJoin(LineJoinStyle.Round));
       for(const a of p.ann){
-        if(a.t=='rect'){
+        if(a.t=='rect'&&!a.hl){
           const [x1,y1]=P(a.x,a.y),[x2,y2]=P(a.x+a.w,a.y+a.h);
-          cp.drawRectangle({x:Math.min(x1,x2),y:Math.min(y1,y2),width:Math.abs(x2-x1),height:Math.abs(y2-y1),color:col(a.c),opacity:a.hl?.4:1,borderWidth:0});
+          cp.drawRectangle({x:Math.min(x1,x2),y:Math.min(y1,y2),width:Math.abs(x2-x1),height:Math.abs(y2-y1),color:col(a.c),borderWidth:0});
         }else if(a.t=='path'){
-          for(let j=1;j<a.p.length;j++){
-            const s=P(a.p[j-1][0],a.p[j-1][1]),e=P(a.p[j][0],a.p[j][1]);
-            cp.drawLine({start:{x:s[0],y:s[1]},end:{x:e[0],y:e[1]},thickness:a.s,color:col(a.c),lineCap:1});
-          }
+          cp.drawSvgPath('M'+a.p.map(q=>pt(q[0],q[1])).join(' L'),{x:0,y:0,scale:1,borderColor:col(a.c),borderWidth:a.s,borderOpacity:oa(a),borderLineCap:1});
         }else if(a.t=='img'){
           if(!srcs[a.sid])continue;
           if(!emb[a.sid])emb[a.sid]=await out.embedPng(srcs[a.sid]);
           const [u,v]=fwd(p,a.x,a.y),[x,y]=vp.convertToPdfPoint(u,v+a.h);
-          cp.drawImage(emb[a.sid],{x,y,width:a.w,height:a.h,rotate:degrees(tot)});
-        }else if(a.t=='text'){
-          const [u,v]=fwd(p,a.x,a.y);
-          a.text.split('\n').forEach((ln,j)=>{
-            const [x,y]=vp.convertToPdfPoint(u,v+a.s*(0.94+j*1.2));
-            const safe=ln.replace(/[^\x20-\x7E\u00A0-\u00FF]/g,'?');
-            if(safe)cp.drawText(safe,{x,y,size:a.s,font,color:col(a.c),rotate:degrees(tot)});
-          });
+          cp.drawImage(emb[a.sid],{x,y,width:a.w,height:a.h,rotate:degrees(tot),opacity:oa(a)});
         }
+      }
+      // One path per color+opacity, so overlapping highlights of the same color don't stack.
+      const groups={};
+      for(const a of p.ann){
+        if(a.t!='rect'||!a.hl)continue;
+        const key=a.c+'|'+oa(a),g=groups[key]||(groups[key]={c:a.c,o:oa(a),d:''});
+        g.d+=`M${pt(a.x,a.y)} L${pt(a.x+a.w,a.y)} L${pt(a.x+a.w,a.y+a.h)} L${pt(a.x,a.y+a.h)} Z `;
+      }
+      for(const g of Object.values(groups))cp.drawSvgPath(g.d,{x:0,y:0,scale:1,color:col(g.c),opacity:g.o,blendMode:BlendMode.Multiply});
+      for(const a of p.ann){
+        if(a.t!='text')continue;
+        const [u,v]=fwd(p,a.x,a.y);
+        a.text.split('\n').forEach((ln,j)=>{
+          const [x,y]=vp.convertToPdfPoint(u,v+a.s*(0.94+j*1.2));
+          const safe=ln.replace(/[^\x20-\x7E -ÿ]/g,'?');
+          if(safe)cp.drawText(safe,{x,y,size:a.s,font,color:col(a.c),rotate:degrees(tot),opacity:oa(a)});
+        });
       }
     }
     const bytes=await out.save(),a=document.createElement('a');
