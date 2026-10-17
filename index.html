@@ -9,10 +9,10 @@
 <meta name="apple-mobile-web-app-title" content="TL;DR.pdf">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=4">
-<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png?v=4">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=4">
-<link rel="shortcut icon" href="favicon.ico?v=4">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=12">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png?v=12">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=12">
+<link rel="shortcut icon" href="favicon.ico?v=12">
 <title>TL;DR.pdf</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
@@ -24,7 +24,7 @@
 html,body{height:100%;margin:0}
 body{display:grid;grid-template-rows:auto 1fr;background:var(--bg);color:var(--text);font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
 header{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
-header h1{font-size:15px;margin:0 10px 0 0;font-weight:650}
+header h1{font-family:'Courier New',Courier,'Liberation Mono',monospace;font-size:17px;margin:0 10px 0 0;font-weight:700;color:#fff;text-shadow:1px 1px 0 #000,2px 2px 3px #000}
 .sep{width:1px;height:22px;background:var(--line);margin:0 4px}
 .b,button{font:inherit;color:var(--text);background:#303a50;border:1px solid var(--line);border-radius:6px;padding:5px 11px;cursor:pointer}
 .b:hover,button:hover{background:#3a4660}
@@ -125,6 +125,7 @@ body.phone #ph{position:fixed;inset:0;display:flex;flex-direction:column;align-i
 #asb small{font-size:10px;color:var(--mute)}
 #asb.warn small{color:#e8c27a}
 #hspace{flex:1}
+#scd,#scd button,#scd input,#scd select,#scd summary{font-family:'Courier New',Courier,'Liberation Mono',monospace}
 #ver{color:var(--mute);font-size:12px;font-weight:600;margin-left:-4px;align-self:center}
 .grp{display:inline-flex;gap:8px;align-items:center;flex:none}
 #dr{pointer-events:auto;margin-top:18px;text-align:left}
@@ -184,7 +185,8 @@ header output{min-width:34px;color:var(--text);font-size:12px}
 .scg tr.om{color:#888}
 @media(max-width:640px){.scr{flex-wrap:wrap}}
 .b[data-tool]{background:#fff;color:#111;border-color:#c9cfdd}
-.b[data-tool]:hover{background:#eaf0ff}
+.b[data-tool]:hover,#scb:hover{background:#eaf0ff}
+#scb{background:#fff;color:#111;border-color:#c9cfdd;font-family:'Courier New',Courier,'Liberation Mono',monospace;font-weight:700}
 .b[data-tool].on{background:var(--acc);border-color:var(--acc);color:#fff}
 .b[data-tool].on:hover{background:#7aa0ff}
 .b svg.ic .ul{fill:var(--ulc,transparent);stroke:#0005;stroke-width:.8}
@@ -261,7 +263,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
   </span>
   <span class="sep"></span>
   <button id="hlt" hidden title="Switch the text under this highlight colour between white and black, everywhere in the PDF (or double-click the highlight)">Text: white</button>
-  <button id="scb" hidden title="Script mode: color the characters, mark scenes, build a cast sheet">Script</button>
+  <button id="scb" hidden title="Script mode: color the characters, mark scenes, build a cast sheet">Markup Script</button>
   <button id="undo" title="Undo (Ctrl+Z)">Undo</button>
   <button id="redo" title="Redo (Ctrl+Y or Ctrl+Shift+Z)">Redo</button>
   <button id="rvb" title="Remove every edit and show the original. You can still undo it.">Revert</button>
@@ -364,7 +366,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
   <details id="scam"><summary>Needs your decision (<span id="scan">0</span>)</summary><p class="mut" style="font-size:12px">A first name in the action that fits more than one character, and nobody in the scene settles it.</p><div id="scal"></div></details>
   <details id="scgd"><summary>Cast sheet preview (hover a scene for its details)</summary><div id="scgrid"></div></details>
   <label class="feel" style="margin-top:8px"><input type="checkbox" id="scidx" style="flex:none"> Add scene index pages (full headings and who is in each) to exports</label>
-  <div class="row"><button id="scap" class="pri">Apply to script</button><button id="sccl">Remove marks</button><button id="scex1" style="margin-left:auto" title="The script with highlights and squares, plus the cast sheet pages at the end">Export script + cast sheet</button><button id="scex2" title="Only the cast sheet pages">Cast sheet only (PDF)</button><button id="scex3" title="A spreadsheet: one row per scene with the full scene heading, one column per character">Cast sheet (Excel)</button><button id="scx">Close</button></div>
+  <div class="row"><button id="scap" class="pri">Apply to script</button><button id="sccl">Remove marks</button><button id="scex1" style="margin-left:auto" title="The script with highlights and squares, plus the cast sheet pages at the end">Markup script + add cast sheet</button><button id="scex2" title="Only the cast sheet pages">Cast sheet only (PDF)</button><button id="scex3" title="A spreadsheet: one row per scene with the full scene heading, one column per character">Cast sheet (Excel)</button><button id="scx">Close</button></div>
 </dialog>
 <div id="toast" hidden role="status"></div>
 <dialog id="te"><h2>Edit text</h2>
@@ -393,7 +395,7 @@ body.tool-edittext .pg{touch-action:none;cursor:text}
 </div>
 <script>
 const $=s=>document.querySelector(s);
-const APP_V=11;   // bump with every export; shown next to the title and used in the delivered folder name
+const APP_V=16;   // bump with every export; shown next to the title and used in the delivered folder name
 $('#ver').textContent='V'+String(APP_V).padStart(2,'0');
 const V=$('#view'),T=$('#thumbs');
 let docs=[],pages=[],tool='select',scale=1.3,sel=null,hist=[],fname='edited.pdf',drag=null,from=null;
@@ -2231,7 +2233,18 @@ function scResolve(scenes,cueChars){
       if(!have.has(id)&&!rm.has(id)&&!SC.chars.some(c=>c.cue&&first(c.cue)==toks[0])){const n={id,name:scTitle(id),color:scColor(SC.nc++),pend:true,on:true,hasLines:false};SC.chars.push(n);have.set(id,n)}
     }
   }
+  // full names that only ever appear in the action ("Silas Hammond"): the cue is just "SILAS"
+  {const NOT=new Set('The And But Then Now Not Just Who Who\u2019s What When Where While With Without Into Onto Over Under From Back Out Off Up Down Her His Their They She He It Its For Has Had Was Were Are Is Be Been Can Will Would Could Should This That These Those One Two Three All Any Some Each Every Sees Looks Turns Walks Stops Says Says Gets Goes Comes'.split(' ').map(w=>w));
+   const firsts=new Set(SC.chars.map(c=>(c.cue||c.name).split(/\s+/)[0].toLowerCase()));
+   for(const c of SC.chars){
+     if(c.full||!c.cue||c.cue.includes(' ')||c.ren)continue;
+     const tc=c.cue[0]+c.cue.slice(1).toLowerCase(),re=new RegExp('\\b'+tc.replace(/[\u2019']/g,"['\u2019]")+'\\s+([A-Z][a-z]{2,})\\b','g'),m=new Map();let tot=0;
+     for(const sc of scenes)for(const a of sc.acts){const T=scTxt(a.L);let x;re.lastIndex=0;while((x=re.exec(T))){if(NOT.has(x[1])||firsts.has(x[1].toLowerCase()))continue;m.set(x[1],(m.get(x[1])||0)+1);tot++}}
+     const top=[...m].sort((a,b)=>b[1]-a[1])[0];
+     if(top&&(top[1]>=2||m.size==1)&&top[1]/tot>=.7)c.full=(c.cue+' '+top[0]).toUpperCase();
+   }}
   for(const s of SC.seeds){const id=s.toUpperCase();if(!have.has(id)&&!rm.has(id)){const n={id,name:scTitle(id),color:scColor(SC.nc++),pend:true,on:true,hasLines:false,seed:true};SC.chars.push(n);have.set(id,n)}}
+  for(const c of SC.chars)if(c.full&&!c.ren)c.name=scTitle(c.full);   // the cast list shows full names
   // drop characters nothing in the script supports any more
   SC.chars=SC.chars.filter(c=>cueChars.has(c.id)||c.seed||c.hasLines===false||c.full);
   // names in the action
@@ -2358,7 +2371,7 @@ function scSpeaker(pg,x,y,w,h,K){   // little loudspeaker with sound waves, cent
   pg.drawSvgPath('M8.7 1.7 Q11.3 5 8.7 8.3',{x:ox,y:oy,scale:sc,borderColor:K,borderWidth:1.1,borderLineCap:1});
 }
 async function scDrawCast(out,font){
-  const {rgb,degrees,StandardFonts}=PDFLib,bold=await out.embedFont(StandardFonts.HelveticaBold);
+  const {rgb,degrees,StandardFonts}=PDFLib,bold=await out.embedFont(StandardFonts.CourierBold);font=await out.embedFont(StandardFonts.Courier);   // screenplay type
   const chars=SC.chars.filter(c=>c.on),scenes=SC.scenes;
   if(!chars.length||!scenes.length)return 0;
   const S=s=>String(s).replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/[\u2013\u2014]/g,'-').replace(/[^\x20-\x7E -ÿ]/g,'?');
@@ -2484,7 +2497,7 @@ function scSoon(){
     const dk=scDk();if(SC.dk&&SC.dk!==dk)scReset();SC.dk=dk;
     const sig=scSig();if(sig===SC.sig)return;SC.sig=sig;
     const ok=await scScan();
-    if(ok&&SC.told!==dk){SC.told=dk;toast(`Script recognized: ${SC.scenes.length} scenes, ${SC.chars.length} characters. Open the Script button to color them.`)}
+    if(ok&&SC.told!==dk){SC.told=dk;toast(`Script recognized: ${SC.scenes.length} scenes, ${SC.chars.length} characters. Open Markup Script to color them.`)}
   },1200);
 }
 function scUI(){
